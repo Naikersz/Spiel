@@ -1,0 +1,18 @@
+[
+    {
+        "name": "Naikers",
+        "skills": {
+            "Strength": 7,
+            "Agility": 7,
+            "Intelligence": 11
+        }
+    },
+    {
+        "name": "Andreas",
+        "skills": {
+            "Strength": 2,
+            "Agility": 2,
+            "Intelligence": 10
+        }
+    }
+]
