@@ -1,0 +1,1 @@
+[{"name": "Hero", "Str": 5, "Vit": 5, "Int": 3, "Dex": 4, "Luk": 2, "exp": 0, "level": 1, "HP": 50, "damage": 10, "defense": 5, "attack_speed": 1.0}, {"name": "Warrior", "Str": 7, "Vit": 6, "Int": 2, "Dex": 3, "Luk": 1, "exp": 0, "level": 1, "HP": 60, "damage": 14, "defense": 6, "attack_speed": 1.0}]
