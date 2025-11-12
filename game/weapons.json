@@ -1,1 +1,18 @@
-weapon = {"name": "sword", "damage": 3, "attack_speed": 1}
+{
+    "weapons": {
+        "sword_iron": {
+            "name": "Eisenschwert",
+            "type": "weapon",
+            "damage": 8,
+            "stat_bonus": {"strength": 2},
+            "value": 50
+        },
+        "staff_wooden": {
+            "name": "Hölzerner Stab",
+            "type": "weapon",
+            "damage": 4,
+            "stat_bonus": {"intelligence": 3},
+            "value": 30
+        }
+    }
+}

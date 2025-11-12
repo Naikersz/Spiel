@@ -1,0 +1,16 @@
+{
+    "leather_armor": {
+        "name": "Lederharnisch",
+        "type": "armor",
+        "defense": 5,
+        "stat_bonus": {"dexterity": 1},
+        "value": 40
+    },
+    "cloth_robe": {
+        "name": "Stoffrobe",
+        "type": "armor",
+        "defense": 2,
+        "stat_bonus": {"mana": 10},
+        "value": 25
+    }
+}
