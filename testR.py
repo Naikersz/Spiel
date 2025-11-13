@@ -1,47 +1,43 @@
 import pygame
-import json
 import os
+import sys
 from typing import Dict, List, Optional
 
 # Инициализация Pygame
 pygame.init()
 
 class CharacterLayer:
-    """Класс для одного слоя персонажа (тело, голова, одежда и т.д.)"""
+    """Класс для одного слоя персонажа (тело, одежда и т.д.)"""
     
-    def __init__(self, layer_data: dict, base_url: str):
-        self.file_name = layer_data["fileName"]
-        self.z_pos = layer_data["zPos"]
-        self.parent_name = layer_data["parentName"]
-        self.name = layer_data["name"]
-        self.variant = layer_data.get("variant", "")
-        self.supported_animations = layer_data["supportedAnimations"].split(",")
+    def __init__(self, sprite_path: str, layer_name: str, z_pos: int = 0):
+        self.sprite_path = sprite_path
+        self.name = layer_name
+        self.z_pos = z_pos
         
         # Загружаем спрайт
-        self.sprite_sheet = self.load_image(base_url + self.file_name)
+        self.sprite_sheet = self.load_image(sprite_path)
         self.frame_width = 64  # Стандартный размер для LPC
         self.frame_height = 64
         
     def load_image(self, path: str) -> pygame.Surface:
         """Загрузка изображения с обработкой ошибок"""
         try:
-            # Если файл локальный
+            # Пытаемся найти файл в разных местах
             if os.path.exists(path):
                 image = pygame.image.load(path).convert_alpha()
+            elif os.path.exists(f"game/assets/sprites/{os.path.basename(path)}"):
+                image = pygame.image.load(f"game/assets/sprites/{os.path.basename(path)}").convert_alpha()
             else:
-                # Для веб-загрузки нужно добавить requests
                 print(f"Файл не найден: {path}")
-                # Создаём временный поверхность
-                image = pygame.Surface((512, 832), pygame.SRCALPHA)  # Размер LPC спрайт-листа
+                # Создаём временную поверхность (красный квадрат для отладки)
+                image = pygame.Surface((512, 832), pygame.SRCALPHA)
+                image.fill((255, 0, 0, 128))  # Полупрозрачный красный
         except Exception as e:
             print(f"Ошибка загрузки {path}: {e}")
             image = pygame.Surface((512, 832), pygame.SRCALPHA)
+            image.fill((255, 255, 0, 128))  # Полупрозрачный жёлтый для ошибок
             
         return image
-        
-    def supports_animation(self, animation_name: str) -> bool:
-        """Проверяет, поддерживает ли слой данную анимацию"""
-        return animation_name in self.supported_animations
     
     def get_frame_rect(self, frame_index: int) -> pygame.Rect:
         """Получает прямоугольник кадра в спрайт-листе"""
@@ -50,10 +46,10 @@ class CharacterLayer:
         return pygame.Rect(frame_x, frame_y, self.frame_width, self.frame_height)
 
 
-class LPCCharacter:
-    """Основной класс персонажа с системой слоёв"""
+class ModularCharacter:
+    """Персонаж с модульной системой одежды"""
     
-    # Стандартные анимации LPC
+    # Стандартные анимации LPC и их номера строк
     ANIMATION_ROWS = {
         "spellcast": 0, "thrust": 1, "walk": 2, "slash": 3,
         "shoot": 4, "hurt": 5, "idle": 6, "jump": 7, "run": 8,
@@ -62,104 +58,68 @@ class LPCCharacter:
         "watering": 16
     }
     
-    def __init__(self, json_data: dict, x: int = 100, y: int = 100):
-        self.body_type = json_data["bodyTypeName"]
-        self.base_url = json_data.get("spritesheets", "")
-        
-        # Позиция на экране
+    def __init__(self, x: int = 100, y: int = 100):
         self.x = x
         self.y = y
         
-        # Словари слоёв
-        self.available_layers: Dict[str, List[CharacterLayer]] = {}
-        self.equipped_layers: Dict[str, CharacterLayer] = {}
+        # Слои персонажа
+        self.layers: Dict[str, CharacterLayer] = {}
         
         # Анимация
         self.current_animation = "idle"
         self.current_frame = 0
-        self.animation_speed = 0.15  # секунды между кадрами
+        self.animation_speed = 0.15
         self.frame_timer = 0
         self.facing_right = True
         
-        # Загружаем слои из JSON
-        self.load_layers_from_json(json_data)
-        
-    def load_layers_from_json(self, json_data: dict):
-        """Загружает все слои из JSON данных"""
-        for layer_data in json_data["layers"]:
-            layer = CharacterLayer(layer_data, self.base_url)
-            layer_type = self._get_layer_type(layer.name)
-            
-            # Добавляем в доступные слои
-            if layer_type not in self.available_layers:
-                self.available_layers[layer_type] = []
-            self.available_layers[layer_type].append(layer)
-            
-            # Автоматически экипируем первый слой каждого типа
-            if layer_type not in self.equipped_layers:
-                self.equipped_layers[layer_type] = layer
+        # Загружаем базовые слои
+        self.load_default_layers()
     
-    def _get_layer_type(self, layer_name: str) -> str:
-        """Определяет тип слоя для категоризации"""
-        name_lower = layer_name.lower()
-        if "body" in name_lower:
-            return "body"
-        elif "head" in name_lower:
-            return "head"
-        elif "hair" in name_lower:
-            return "hair"
-        elif "chest" in name_lower or "torso" in name_lower:
-            return "chest"
-        elif "legs" in name_lower or "pants" in name_lower:
-            return "legs"
-        elif "feet" in name_lower or "shoes" in name_lower:
-            return "feet"
-        elif "hand" in name_lower:
-            return "hands"
+    def load_default_layers(self):
+        """Загружает базовые слои персонажа"""
+    # Основное тело персонажа
+        body_layer = CharacterLayer(
+            "game/assets/sprites/body/bodies/male/light.png", 
+            "body", 
+            z_pos=10
+        )
+        self.layers["body"] = body_layer
+    
+        # Голова персонажа
+        head_layer = CharacterLayer(
+            "game/assets/sprites/head/heads/human/male/light.png",  # Укажите ваш правильный путь к голове
+            "head", 
+            z_pos=50  # z_pos между телом и волосами/шляпой
+        )
+        self.layers["head"] = head_layer
+    
+        # Шляпа (изначально не надета)
+        hat_layer = CharacterLayer(
+            "game/assets/sprites/hut.png",
+            "hat",
+            z_pos=100  # Высокий z_pos чтобы была поверх всего
+        )
+        self.layers["hat"] = hat_layer
+    
+        # Автоматически делаем видимыми тело и голову
+        self.visible_layers = {"body", "head"}
+    
+        print("Загружены слои: body, head, hat")
+    
+    def toggle_clothing(self, item_name: str) -> bool:
+        """Включает/выключает элемент одежды"""
+        if item_name in self.layers:
+            if item_name in self.visible_layers:
+                self.visible_layers.remove(item_name)
+                print(f"✗ Снято: {item_name}")
+                return False
+            else:
+                self.visible_layers.add(item_name)
+                print(f"✓ Надето: {item_name}")
+                return True
         else:
-            return "accessory"
-    
-    def equip_layer(self, layer_type: str, variant: str = "") -> bool:
-        """Экипирует слой определённого типа и варианта"""
-        if layer_type not in self.available_layers:
-            print(f"Тип слоя '{layer_type}' не найден")
+            print(f"✗ Предмет '{item_name}' не найден")
             return False
-            
-        # Ищем слой по варианту
-        target_layer = None
-        for layer in self.available_layers[layer_type]:
-            if not variant or layer.variant == variant:
-                target_layer = layer
-                break
-                
-        if target_layer:
-            self.equipped_layers[layer_type] = target_layer
-            print(f"Экипирован: {layer_type} - {target_layer.name}")
-            return True
-        else:
-            print(f"Слой '{layer_type}' с вариантом '{variant}' не найден")
-            return False
-    
-    def unequip_layer(self, layer_type: str) -> bool:
-        """Снимает слой (кроме обязательных как body и head)"""
-        if layer_type in ["body", "head"]:
-            print(f"Нельзя снять обязательный слой: {layer_type}")
-            return False
-            
-        if layer_type in self.equipped_layers:
-            del self.equipped_layers[layer_type]
-            print(f"Снят слой: {layer_type}")
-            return True
-        return False
-    
-    def add_new_layer(self, layer_data: dict):
-        """Добавляет новый слой в доступные"""
-        layer = CharacterLayer(layer_data, self.base_url)
-        layer_type = self._get_layer_type(layer.name)
-        
-        if layer_type not in self.available_layers:
-            self.available_layers[layer_type] = []
-        self.available_layers[layer_type].append(layer)
     
     def set_animation(self, animation_name: str):
         """Устанавливает текущую анимацию"""
@@ -168,9 +128,9 @@ class LPCCharacter:
                 self.current_animation = animation_name
                 self.current_frame = 0
                 self.frame_timer = 0
+                print(f"Анимация: {animation_name}")
         else:
-            print(f"Анимация '{animation_name}' не найдена. Используется 'idle'")
-            self.current_animation = "idle"
+            print(f"Анимация '{animation_name}' не найдена")
     
     def update(self, dt: float):
         """Обновляет анимацию персонажа"""
@@ -178,34 +138,40 @@ class LPCCharacter:
         
         if self.frame_timer >= self.animation_speed:
             self.frame_timer = 0
-            self.current_frame = (self.current_frame + 1) % 8  # 8 кадров на анимацию
+            self.current_frame = (self.current_frame + 1) % 8
     
     def get_frame_index(self) -> int:
-        """Получает индекс кадра в спрайт-листе LPC"""
-        row = self.ANIMATION_ROWS.get(self.current_animation, 6)  # По умолчанию idle
-        return row * 8 + self.current_frame  # 8 кадров в строке
+        """Получает индекс кадра в спрайт-листе"""
+        row = self.ANIMATION_ROWS.get(self.current_animation, 6)  # idle по умолчанию
+        return row * 8 + self.current_frame
     
     def draw(self, screen: pygame.Surface):
-        """Отрисовывает персонажа со всеми слоями"""
-        # Сортируем слои по zPos для правильного порядка отрисовки
-        sorted_layers = sorted(
-            self.equipped_layers.values(), 
-            key=lambda layer: layer.z_pos
-        )
-        
+        """Отрисовывает персонажа со всеми видимыми слоями"""
         frame_index = self.get_frame_index()
         
+        # Определяем какие слои рисовать
+        layers_to_draw = []
+        for layer_name, layer in self.layers.items():
+            if hasattr(self, 'visible_layers'):
+                if layer_name in self.visible_layers:
+                    layers_to_draw.append(layer)
+            else:
+                # Если visible_layers не определен, рисуем все слои
+                layers_to_draw.append(layer)
+        
+        # Сортируем по z_pos
+        layers_to_draw.sort(key=lambda layer: layer.z_pos)
+        
         # Отрисовываем каждый слой
-        for layer in sorted_layers:
-            if layer.supports_animation(self.current_animation):
-                frame_rect = layer.get_frame_rect(frame_index)
-                sprite_to_draw = layer.sprite_sheet.subsurface(frame_rect)
-                
-                # Отражаем спрайт если смотрит влево
-                if not self.facing_right:
-                    sprite_to_draw = pygame.transform.flip(sprite_to_draw, True, False)
-                
-                screen.blit(sprite_to_draw, (self.x, self.y))
+        for layer in layers_to_draw:
+            frame_rect = layer.get_frame_rect(frame_index)
+            sprite_to_draw = layer.sprite_sheet.subsurface(frame_rect)
+            
+            # Отражаем спрайт если смотрит влево
+            if not self.facing_right:
+                sprite_to_draw = pygame.transform.flip(sprite_to_draw, True, False)
+            
+            screen.blit(sprite_to_draw, (self.x, self.y))
     
     def move(self, dx: int, dy: int):
         """Перемещает персонажа"""
@@ -223,87 +189,54 @@ class LPCCharacter:
             self.set_animation("walk")
         else:
             self.set_animation("idle")
-    
-    def get_equipped_items(self) -> Dict[str, str]:
-        """Возвращает словарь экипированных предметов"""
-        return {layer_type: layer.name for layer_type, layer in self.equipped_layers.items()}
 
 
-# Пример использования
-def main():
-    # Настройки экрана
-    SCREEN_WIDTH = 800
-    SCREEN_HEIGHT = 600
-    screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-    pygame.display.set_caption("LPC Character System")
-    clock = pygame.time.Clock()
+class SimpleGame:
+    """Простая игра для демонстрации системы"""
     
-    # Пример JSON данных (можно загрузить из файла)
-    example_json = {
-        "bodyTypeName": "male",
-        "spritesheets": "assets/sprites/",
-        "layers": [
-            {
-                "fileName": "body/bodies/male/light.png",
-                "zPos": 10,
-                "parentName": "body",
-                "name": "Body_color",
-                "variant": "light",
-                "supportedAnimations": "spellcast,thrust,walk,slash,shoot,hurt,watering,idle,jump,run,sit,emote,climb,combat,1h_slash,1h_backslash,1h_halfslash"
-            },
-            {
-                "fileName": "head/heads/human/male/light.png",
-                "zPos": 100,
-                "parentName": "head",
-                "name": "Human_male",
-                "variant": "light",
-                "supportedAnimations": "spellcast,thrust,walk,slash,shoot,hurt,watering,idle,jump,run,sit,emote,climb,combat,1h_slash,1h_backslash,1h_halfslash"
-            }
-        ]
-    }
-    
-    # Создаём персонажа
-    player = LPCCharacter(example_json, 400, 300)
-    
-    # Добавляем дополнительные слои (пример)
-    hair_layer_data = {
-        "fileName": "hair/hairs/male/black.png",
-        "zPos": 90,
-        "parentName": "head", 
-        "name": "Hair_male",
-        "variant": "black",
-        "supportedAnimations": "spellcast,thrust,walk,slash,shoot,hurt,watering,idle,jump,run,sit,emote,climb,combat,1h_slash,1h_backslash,1h_halfslash"
-    }
-    player.add_new_layer(hair_layer_data)
-    player.equip_layer("hair", "black")
-    
-    # Главный игровой цикл
-    running = True
-    while running:
-        dt = clock.tick(60) / 1000.0  # Delta time в секундах
+    def __init__(self):
+        self.screen_width = 800
+        self.screen_height = 600
+        self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
+        pygame.display.set_caption("Spiel - Модульная система персонажа")
+        self.clock = pygame.time.Clock()
+        self.running = True
         
-        # Обработка событий
+        # Создаём персонажа
+        self.player = ModularCharacter(400, 300)
+        
+        # Шрифт для отладочной информации
+        self.font = pygame.font.Font(None, 24)
+    
+    def handle_events(self):
+        """Обрабатывает события"""
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
-                running = False
+                self.running = False
             elif event.type == pygame.KEYDOWN:
-                # Смена анимаций по клавишам
+                # Смена анимаций
                 if event.key == pygame.K_1:
-                    player.set_animation("idle")
+                    self.player.set_animation("idle")
                 elif event.key == pygame.K_2:
-                    player.set_animation("walk") 
+                    self.player.set_animation("walk")
                 elif event.key == pygame.K_3:
-                    player.set_animation("jump")
+                    self.player.set_animation("jump")
                 elif event.key == pygame.K_4:
-                    player.set_animation("slash")
-                elif event.key == pygame.K_5:
-                    player.set_animation("spellcast")
+                    self.player.set_animation("slash")
+                
                 # Смена одежды
                 elif event.key == pygame.K_h:
-                    if "hair" in player.equipped_layers:
-                        player.unequip_layer("hair")
-                    else:
-                        player.equip_layer("hair", "black")
+                    self.player.toggle_clothing("hat")
+                
+                # Тестовые анимации
+                elif event.key == pygame.K_5:
+                    self.player.set_animation("spellcast")
+                elif event.key == pygame.K_6:
+                    self.player.set_animation("hurt")
+    
+    def update(self):
+        """Обновляет состояние игры"""
+        dt = self.clock.tick(60) / 1000.0
         
         # Управление движением
         keys = pygame.key.get_pressed()
@@ -317,23 +250,75 @@ def main():
         if keys[pygame.K_DOWN]:
             move_y = 3
             
-        player.move(move_x, move_y)
-        player.update(dt)
+        self.player.move(move_x, move_y)
+        self.player.update(dt)
+    
+    def draw_debug_info(self):
+        """Рисует отладочную информацию"""
+        # Фон для текста
+        debug_bg = pygame.Surface((300, 120), pygame.SRCALPHA)
+        debug_bg.fill((0, 0, 0, 128))
+        self.screen.blit(debug_bg, (10, 10))
         
-        # Отрисовка
-        screen.fill((50, 50, 80))  # Темно-синий фон
-        player.draw(screen)
+        # Текст информации
+        anim_text = self.font.render(f"Анимация: {self.player.current_animation}", True, (255, 255, 255))
+        frame_text = self.font.render(f"Кадр: {self.player.current_frame}", True, (255, 255, 255))
+        pos_text = self.font.render(f"Позиция: ({self.player.x}, {self.player.y})", True, (255, 255, 255))
+        
+        # Определяем надета ли шляпа
+        hat_status = "Надета" if (hasattr(self.player, 'visible_layers') and "hat" in self.player.visible_layers) else "Снята"
+        hat_text = self.font.render(f"Шляпа: {hat_status}", True, (255, 255, 255))
+        
+        # Управление
+        controls1 = self.font.render("Управление: Стрелки - движение, 1-4 - анимации", True, (255, 255, 255))
+        controls2 = self.font.render("H - шляпа вкл/выкл, 5-6 - доп. анимации", True, (255, 255, 255))
+        
+        # Отображаем весь текст
+        self.screen.blit(anim_text, (20, 20))
+        self.screen.blit(frame_text, (20, 45))
+        self.screen.blit(pos_text, (20, 70))
+        self.screen.blit(hat_text, (20, 95))
+        self.screen.blit(controls1, (20, 130))
+        self.screen.blit(controls2, (20, 155))
+    
+    def draw(self):
+        """Отрисовывает игру"""
+        # Фон
+        self.screen.fill((70, 70, 120))
+        
+        # Рисуем сетку для отладки
+        for x in range(0, self.screen_width, 64):
+            pygame.draw.line(self.screen, (100, 100, 150), (x, 0), (x, self.screen_height))
+        for y in range(0, self.screen_height, 64):
+            pygame.draw.line(self.screen, (100, 100, 150), (0, y), (self.screen_width, y))
+        
+        # Персонаж
+        self.player.draw(self.screen)
         
         # Отладочная информация
-        font = pygame.font.Font(None, 36)
-        anim_text = font.render(f"Animation: {player.current_animation}", True, (255, 255, 255))
-        items_text = font.render(f"Items: {len(player.equipped_layers)}", True, (255, 255, 255))
-        screen.blit(anim_text, (10, 10))
-        screen.blit(items_text, (10, 50))
+        self.draw_debug_info()
         
         pygame.display.flip()
     
-    pygame.quit()
+    def run(self):
+        """Запускает главный игровой цикл"""
+        print("Запуск игры...")
+        print("Управление:")
+        print("  Стрелки - движение")
+        print("  1-4 - основные анимации")
+        print("  5-6 - дополнительные анимации") 
+        print("  H - надеть/снять шляпу")
+        
+        while self.running:
+            self.handle_events()
+            self.update()
+            self.draw()
+        
+        pygame.quit()
+        sys.exit()
 
+
+# Запуск игры
 if __name__ == "__main__":
-    main()
+    game = SimpleGame()
+    game.run()
