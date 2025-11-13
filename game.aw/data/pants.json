@@ -1,0 +1,62 @@
+[
+  {
+    "id": "cloth_pants",
+    "name": "Cloth Pants",
+    "item_type": "pants",
+    "item_level": 1,
+    "min_player_level": 1,
+    "min_strength": 0,
+    "min_intelligence": 5,
+    "defense": {"min": 1, "max": 3},
+    "magic_defense": {"min": 3, "max": 6},
+    "enchantments": []
+  },
+  {
+    "id": "leather_pants",
+    "name": "Leather Pants",
+    "item_type": "pants",
+    "item_level": 5,
+    "min_player_level": 3,
+    "min_strength": 5,
+    "min_intelligence": 0,
+    "defense": {"min": 4, "max": 7},
+    "magic_defense": {"min": 1, "max": 3},
+    "enchantments": []
+  },
+  {
+    "id": "chain_pants",
+    "name": "Chain Pants",
+    "item_type": "pants",
+    "item_level": 10,
+    "min_player_level": 5,
+    "min_strength": 10,
+    "min_intelligence": 0,
+    "defense": {"min": 7, "max": 11},
+    "magic_defense": {"min": 2, "max": 4},
+    "enchantments": []
+  },
+  {
+    "id": "scale_pants",
+    "name": "Scale Pants",
+    "item_type": "pants",
+    "item_level": 20,
+    "min_player_level": 10,
+    "min_strength": 18,
+    "min_intelligence": 0,
+    "defense": {"min": 12, "max": 18},
+    "magic_defense": {"min": 3, "max": 6},
+    "enchantments": []
+  },
+  {
+    "id": "plate_pants",
+    "name": "Plate Pants",
+    "item_type": "pants",
+    "item_level": 30,
+    "min_player_level": 15,
+    "min_strength": 25,
+    "min_intelligence": 0,
+    "defense": {"min": 18, "max": 25},
+    "magic_defense": {"min": 4, "max": 7},
+    "enchantments": []
+  }
+]

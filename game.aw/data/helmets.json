@@ -1,0 +1,92 @@
+[
+  {
+    "id": "Iron_Helmet",
+    "name": "Eisenhelm",
+    "item_type": "helmet",
+    "item_level": 1,
+    "min_player_level": 1,
+    "requirements": {
+      "strength": 3,
+      "dexterity": 0,
+      "intelligence": 0
+    },
+    "base_stats": {
+      "defence_min": 3,
+      "defence_max": 6
+    },
+    "enchant_slots": 6,
+    "possible_enchantments": []
+  },
+  {
+    "id": "Leather_Cap",
+    "name": "Ledermütze",
+    "item_type": "helmet",
+    "item_level": 2,
+    "min_player_level": 2,
+    "requirements": {
+      "strength": 1,
+      "dexterity": 3,
+      "intelligence": 0
+    },
+    "base_stats": {
+      "defence_min": 2,
+      "defence_max": 5
+    },
+    "enchant_slots": 4,
+    "possible_enchantments": []
+  },
+  {
+    "id": "Chain_Hood",
+    "name": "Kettenhaube",
+    "item_type": "helmet",
+    "item_level": 3,
+    "min_player_level": 3,
+    "requirements": {
+      "strength": 4,
+      "dexterity": 2,
+      "intelligence": 0
+    },
+    "base_stats": {
+      "defence_min": 5,
+      "defence_max": 9
+    },
+    "enchant_slots": 6,
+    "possible_enchantments": []
+  },
+  {
+    "id": "Rune_Helmet",
+    "name": "Runenhelm",
+    "item_type": "helmet",
+    "item_level": 5,
+    "min_player_level": 5,
+    "requirements": {
+      "strength": 2,
+      "dexterity": 0,
+      "intelligence": 4
+    },
+    "base_stats": {
+      "defence_min": 6,
+      "defence_max": 10
+    },
+    "enchant_slots": 5,
+    "possible_enchantments": []
+  },
+  {
+    "id": "Dragon_Helmet",
+    "name": "Drachenhelm",
+    "item_type": "helmet",
+    "item_level": 8,
+    "min_player_level": 8,
+    "requirements": {
+      "strength": 10,
+      "dexterity": 3,
+      "intelligence": 3
+    },
+    "base_stats": {
+      "defence_min": 10,
+      "defence_max": 15
+    },
+    "enchant_slots": 6,
+    "possible_enchantments": []
+  }
+]

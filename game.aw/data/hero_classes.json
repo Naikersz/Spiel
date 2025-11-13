@@ -1,0 +1,58 @@
+[
+    {
+        "id": "warrior",
+        "name": "Warrior",
+        "base_health": 150,
+        "base_strength": 20,
+        "base_intelligence": 5,
+        "base_dexterity": 10,
+        "base_speed": 10,
+        "starter_items": [
+            "Iron_Sword",
+            "Iron_Chestplate",
+            "Iron_Pants"
+        ]
+    },
+    {
+        "id": "mage",
+        "name": "Mage",
+        "base_health": 100,
+        "base_strength": 5,
+        "base_intelligence": 25,
+        "base_dexterity": 10,
+        "base_speed": 12,
+        "starter_items": [
+            "Magic_Staff",
+            "Cloth_Robe",
+            "Cloth_Pants"
+        ]
+    },
+    {
+        "id": "rogue",
+        "name": "Rogue",
+        "base_health": 120,
+        "base_strength": 15,
+        "base_intelligence": 10,
+        "base_dexterity": 20,
+        "base_speed": 20,
+        "starter_items": [
+            "Dagger",
+            "Leather_Armor",
+            "Leather_Pants"
+        ]
+    },
+    {
+        "id": "healer",
+        "name": "Healer",
+        "base_health": 110,
+        "base_strength": 8,
+        "base_intelligence": 20,
+        "base_dexterity": 12,
+        "base_speed": 14,
+        "starter_items": [
+            "Healing_Staff",
+            "Light_Robe",
+            "Linen_Pants"
+        ]
+    }
+]

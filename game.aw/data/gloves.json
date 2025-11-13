@@ -1,0 +1,57 @@
+[
+  {
+    "id": "Leather_Gloves",
+    "name": "Lederhandschuhe",
+    "item_type": "glove",
+    "item_level": 1,
+    "min_player_level": 1,
+    "requirements": { "strength": 1, "dexterity": 2, "intelligence": 0 },
+    "base_stats": { "defence_min": 1, "defence_max": 3, "attack_speed": 1 },
+    "enchant_slots": 4,
+    "possible_enchantments": []
+  },
+  {
+    "id": "Chain_Gloves",
+    "name": "Kettenhandschuhe",
+    "item_type": "glove",
+    "item_level": 3,
+    "min_player_level": 3,
+    "requirements": { "strength": 4, "dexterity": 3, "intelligence": 0 },
+    "base_stats": { "defence_min": 3, "defence_max": 6, "attack_speed": 1.1 },
+    "enchant_slots": 4,
+    "possible_enchantments": []
+  },
+  {
+    "id": "Steel_Gloves",
+    "name": "Stahlhandschuhe",
+    "item_type": "glove",
+    "item_level": 5,
+    "min_player_level": 5,
+    "requirements": { "strength": 6, "dexterity": 4, "intelligence": 0 },
+    "base_stats": { "defence_min": 5, "defence_max": 9, "attack_speed": 1.15 },
+    "enchant_slots": 4,
+    "possible_enchantments": []
+  },
+  {
+    "id": "Reinforced_Gloves",
+    "name": "Verstärkte Handschuhe",
+    "item_type": "glove",
+    "item_level": 7,
+    "min_player_level": 7,
+    "requirements": { "strength": 8, "dexterity": 5, "intelligence": 0 },
+    "base_stats": { "defence_min": 7, "defence_max": 12, "attack_speed": 1.2 },
+    "enchant_slots": 5,
+    "possible_enchantments": []
+  },
+  {
+    "id": "Dragon_Leather_Gloves",
+    "name": "Drachenlederhandschuhe",
+    "item_type": "glove",
+    "item_level": 10,
+    "min_player_level": 10,
+    "requirements": { "strength": 10, "dexterity": 7, "intelligence": 0 },
+    "base_stats": { "defence_min": 10, "defence_max": 16, "attack_speed": 1.25 },
+    "enchant_slots": 5,
+    "possible_enchantments": []
+  }
+]
