@@ -1,0 +1,74 @@
+{
+    "name": "Bla",
+    "class_id": "mage",
+    "class_name": "Mage",
+    "created_at": "2025-11-13T17:19:08.666612",
+    "stats": {
+        "health": 100,
+        "strength": 5,
+        "intelligence": 25,
+        "dexterity": 10,
+        "speed": 12,
+        "level": 1,
+        "experience": 0
+    },
+    "equipped": {
+        "weapon": null,
+        "helmet": null,
+        "chest": {
+            "id": "cloth_robe",
+            "name": "Cloth Robe",
+            "item_type": "chest",
+            "item_level": 1,
+            "min_player_level": 1,
+            "min_intelligence": 3,
+            "defence": 2,
+            "magic_defence": 4,
+            "enchantments": []
+        },
+        "pants": {
+            "id": "cloth_pants",
+            "name": "Cloth Pants",
+            "item_type": "pants",
+            "item_level": 1,
+            "min_player_level": 1,
+            "min_strength": 0,
+            "min_intelligence": 5,
+            "defense": 1,
+            "magic_defense": 3,
+            "enchantments": []
+        },
+        "gloves": null,
+        "boots": null,
+        "shield": null,
+        "null": null,
+        "glove": {
+            "id": "Leather_Gloves",
+            "name": "Lederhandschuhe",
+            "item_type": "glove",
+            "item_level": 1,
+            "min_player_level": 1,
+            "requirements": {
+                "strength": 1,
+                "dexterity": 2,
+                "intelligence": 0
+            },
+            "base_stats": {
+                "defence": 1,
+                "attack_speed": 1
+            },
+            "attack_speed": 1.0,
+            "enchant_slots": 4,
+            "possible_enchantments": []
+        }
+    },
+    "total_stats": {
+        "health": 100,
+        "strength": 5,
+        "intelligence": 25,
+        "dexterity": 10,
+        "speed": 12,
+        "level": 1,
+        "experience": 0
+    }
+}

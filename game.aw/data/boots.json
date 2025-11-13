@@ -1,0 +1,57 @@
+[
+  {
+    "id": "Leather_Boots",
+    "name": "Lederschuhe",
+    "item_type": "boot",
+    "item_level": 1,
+    "min_player_level": 1,
+    "requirements": { "strength": 1, "dexterity": 2, "intelligence": 0 },
+    "base_stats": { "defence_min": 1, "defence_max": 3, "movement_speed": 2 },
+    "enchant_slots": 4,
+    "possible_enchantments": []
+  },
+  {
+    "id": "Chain_Boots",
+    "name": "Kettenschuhe",
+    "item_type": "boot",
+    "item_level": 3,
+    "min_player_level": 3,
+    "requirements": { "strength": 3, "dexterity": 3, "intelligence": 0 },
+    "base_stats": { "defence_min": 3, "defence_max": 6, "movement_speed": 3 },
+    "enchant_slots": 4,
+    "possible_enchantments": []
+  },
+  {
+    "id": "Steel_Boots",
+    "name": "Stahlschuhe",
+    "item_type": "boot",
+    "item_level": 5,
+    "min_player_level": 5,
+    "requirements": { "strength": 5, "dexterity": 3, "intelligence": 0 },
+    "base_stats": { "defence_min": 5, "defence_max": 9, "movement_speed": 4 },
+    "enchant_slots": 5,
+    "possible_enchantments": []
+  },
+  {
+    "id": "Rune_Boots",
+    "name": "Runenschuhe",
+    "item_type": "boot",
+    "item_level": 7,
+    "min_player_level": 7,
+    "requirements": { "strength": 6, "dexterity": 2, "intelligence": 3 },
+    "base_stats": { "defence_min": 7, "defence_max": 12, "movement_speed": 5 },
+    "enchant_slots": 5,
+    "possible_enchantments": []
+  },
+  {
+    "id": "Dragon_Boots",
+    "name": "Drachenstiefel",
+    "item_type": "boot",
+    "item_level": 10,
+    "min_player_level": 10,
+    "requirements": { "strength": 8, "dexterity": 4, "intelligence": 3 },
+    "base_stats": { "defence_min": 10, "defence_max": 16, "movement_speed": 6 },
+    "enchant_slots": 6,
+    "possible_enchantments": []
+  }
+]

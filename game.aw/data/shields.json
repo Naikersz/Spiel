@@ -1,0 +1,57 @@
+[
+  {
+    "id": "Wood_Shield",
+    "name": "Holzschild",
+    "item_type": "shield",
+    "item_level": 1,
+    "min_player_level": 1,
+    "requirements": { "strength": 1, "dexterity": 0, "intelligence": 0 },
+    "base_stats": { "defence_min": 2, "defence_max": 4, "block_chance": 5 },
+    "enchant_slots": 4,
+    "possible_enchantments": []
+  },
+  {
+    "id": "Iron_Shield",
+    "name": "Eisenschild",
+    "item_type": "shield",
+    "item_level": 3,
+    "min_player_level": 3,
+    "requirements": { "strength": 3, "dexterity": 0, "intelligence": 0 },
+    "base_stats": { "defence_min": 5, "defence_max": 9, "block_chance": 8 },
+    "enchant_slots": 4,
+    "possible_enchantments": []
+  },
+  {
+    "id": "Steel_Shield",
+    "name": "Stahlschild",
+    "item_type": "shield",
+    "item_level": 5,
+    "min_player_level": 5,
+    "requirements": { "strength": 6, "dexterity": 0, "intelligence": 0 },
+    "base_stats": { "defence_min": 9, "defence_max": 15, "block_chance": 10 },
+    "enchant_slots": 5,
+    "possible_enchantments": []
+  },
+  {
+    "id": "Rune_Shield",
+    "name": "Runenschild",
+    "item_type": "shield",
+    "item_level": 7,
+    "min_player_level": 7,
+    "requirements": { "strength": 8, "dexterity": 0, "intelligence": 3 },
+    "base_stats": { "defence_min": 12, "defence_max": 18, "block_chance": 12 },
+    "enchant_slots": 5,
+    "possible_enchantments": []
+  },
+  {
+    "id": "Dragon_Shield",
+    "name": "Drachenschild",
+    "item_type": "shield",
+    "item_level": 10,
+    "min_player_level": 10,
+    "requirements": { "strength": 12, "dexterity": 2, "intelligence": 4 },
+    "base_stats": { "defence_min": 16, "defence_max": 24, "block_chance": 15 },
+    "enchant_slots": 6,
+    "possible_enchantments": []
+  }
+]

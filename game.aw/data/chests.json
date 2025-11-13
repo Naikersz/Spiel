@@ -1,0 +1,57 @@
+[
+  {
+    "id": "cloth_robe",
+    "name": "Cloth Robe",
+    "item_type": "chest",
+    "item_level": 1,
+    "min_player_level": 1,
+    "min_intelligence": 3,
+    "defence": {"min": 2, "max": 4},
+    "magic_defence": {"min": 4, "max": 6},
+    "enchantments": []
+  },
+  {
+    "id": "leather_armor",
+    "name": "Leather Armor",
+    "item_type": "chest",
+    "item_level": 1,
+    "min_player_level": 1,
+    "min_dexterity": 3,
+    "defence": {"min": 4, "max": 6},
+    "magic_defence": {"min": 2, "max": 4},
+    "enchantments": []
+  },
+  {
+    "id": "chainmail",
+    "name": "Chainmail",
+    "item_type": "chest",
+    "item_level": 1,
+    "min_player_level": 1,
+    "min_strength": 3,
+    "defence": {"min": 5, "max": 8},
+    "magic_defence": {"min": 1, "max": 3},
+    "enchantments": []
+  },
+  {
+    "id": "reinforced_leather_armor",
+    "name": "Reinforced Leather Armor",
+    "item_type": "chest",
+    "item_level": 10,
+    "min_player_level": 5,
+    "min_dexterity": 10,
+    "defence": {"min": 8, "max": 12},
+    "magic_defence": {"min": 4, "max": 6},
+    "enchantments": []
+  },
+  {
+    "id": "steel_plate_armor",
+    "name": "Steel Plate Armor",
+    "item_type": "chest",
+    "item_level": 20,
+    "min_player_level": 10,
+    "min_strength": 15,
+    "defence": {"min": 12, "max": 18},
+    "magic_defence": {"min": 3, "max": 5},
+    "enchantments": []
+  }
+]
