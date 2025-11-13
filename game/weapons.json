@@ -13,6 +13,13 @@
             "damage": 4,
             "stat_bonus": {"intelligence": 3},
             "value": 30
+        },
+        "dagger": {
+            "name": "Dolch",
+            "type": "weapon",
+            "damage": 3,
+            "stat_bonus": {"dexterity": 3},
+            "value": 30
         }
     }
 }

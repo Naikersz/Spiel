@@ -1,16 +1,103 @@
 {
+  "armor": {
     "leather_armor": {
-        "name": "Lederharnisch",
-        "type": "armor",
-        "defense": 5,
-        "stat_bonus": {"dexterity": 1},
-        "value": 40
+      "name": "Lederharnisch",
+      "type": "armor",
+      "rarity": "common",
+      "defense": 5,
+      "weight": 3.0,
+      "stat_bonus": {
+        "dexterity": 1
+      },
+      "requirements": {
+        "level": 1,
+        "strength": 5
+      },
+      "value": 40,
+      "description": "Ein einfacher, aber flexibler Harnisch aus gehärtetem Leder."
+    },
+    "chainmail": {
+      "name": "Kettenhemd",
+      "type": "armor",
+      "rarity": "uncommon",
+      "defense": 10,
+      "weight": 6.5,
+      "stat_bonus": {
+        "vitality": 2
+      },
+      "requirements": {
+        "level": 3,
+        "strength": 8
+      },
+      "value": 120,
+      "description": "Ein robustes Kettenhemd, das guten Schutz gegen physische Angriffe bietet."
+    },
+    "plate_armor": {
+      "name": "Plattenrüstung",
+      "type": "armor",
+      "rarity": "rare",
+      "defense": 18,
+      "weight": 12.0,
+      "stat_bonus": {
+        "vitality": 4,
+        "strength": 2
+      },
+      "requirements": {
+        "level": 6,
+        "strength": 12
+      },
+      "value": 300,
+      "description": "Eine schwere Rüstung aus gehärtetem Stahl – exzellenter Schutz, aber sehr schwer."
     },
     "cloth_robe": {
-        "name": "Stoffrobe",
-        "type": "armor",
-        "defense": 2,
-        "stat_bonus": {"mana": 10},
-        "value": 25
+      "name": "Stoffrobe",
+      "type": "armor",
+      "rarity": "common",
+      "defense": 2,
+      "weight": 1.0,
+      "stat_bonus": {
+        "mana": 10
+      },
+      "requirements": {
+        "level": 1,
+        "intelligence": 5
+      },
+      "value": 25,
+      "description": "Eine leichte Robe, bevorzugt von Magiern wegen der Bewegungsfreiheit."
+    },
+    "mage_robe": {
+      "name": "Robe des Adepten",
+      "type": "armor",
+      "rarity": "rare",
+      "defense": 4,
+      "weight": 1.2,
+      "stat_bonus": {
+        "intelligence": 3,
+        "mana": 20
+      },
+      "requirements": {
+        "level": 5,
+        "intelligence": 10
+      },
+      "value": 150,
+      "description": "Eine magisch verstärkte Robe, die den Fluss der arkanen Energie verbessert."
+    },
+    "shadow_cloak": {
+      "name": "Schattenumhang",
+      "type": "armor",
+      "rarity": "epic",
+      "defense": 8,
+      "weight": 2.5,
+      "stat_bonus": {
+        "dexterity": 4,
+        "evasion": 10
+      },
+      "requirements": {
+        "level": 8,
+        "dexterity": 12
+      },
+      "value": 400,
+      "description": "Ein dunkler Umhang, der den Träger mit den Schatten verschmelzen lässt."
     }
+  }
 }
