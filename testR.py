@@ -1,66 +1,123 @@
 import pygame
-import sys
+import json
+import os
+import requests
 
 pygame.init()
-screen = pygame.display.set_mode((800, 600), pygame.RESIZABLE)
+
+# ===== Настройки окна =====
+SCREEN_WIDTH, SCREEN_HEIGHT = 800, 600
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Персонаж с экипировкой")
 clock = pygame.time.Clock()
+FPS = 60
 
-# Загрузка sprite sheet (поместите player_spritesheet.png в папку с кодом)
-# Пример: 4 кадра по 64x64 пикселя в ряд
-spritesheet = pygame.image.load("game/images/player.png").convert_alpha()
-frame_width, frame_height = 64, 64  # Размер одного кадра
-frames = [] 
+# ===== Создание папок =====
+base_dir = "game"
+folders = [
+    "assets/body/bodies/male",
+    "assets/head/heads/human/male",
+    "assets/hat/cloth/leather_cap/adult",
+    "data/raw",
+    "data/processed",
+    "src/utils",
+    "docs"
+]
 
-# Извлечение кадров из sprite sheet (горизонтальная строка, 4 кадра)
-for i in range(6):
-    rect = pygame.Rect(i * frame_width, 0, frame_width, frame_height)
-    frame = spritesheet.subsurface(rect)
-    frames.append(frame)
+for folder in folders:
+    path = os.path.join(base_dir, folder)
+    os.makedirs(path, exist_ok=True)
 
-class Player(pygame.sprite.Sprite):
-    def __init__(self):
-        super().__init__()
-        self.image = frames[0]
-        self.rect = self.image.get_rect(center=(400, 300))
-        self.frame_index = 0
-        self.animation_speed = 0.2  # Скорость анимации
-        self.anim_counter = 0
+# ===== Загрузка JSON =====
+json_path = os.path.join(base_dir, "players.json")
+with open(json_path, "r") as f:
+    char_data = json.load(f)
 
-    def update(self):
-        # Логика движения (пример: WASD)
-        keys = pygame.key.get_pressed()
-        if keys[pygame.K_w] or keys[pygame.K_s] or keys[pygame.K_a] or keys[pygame.K_d]:
-            self.anim_counter += 1
-            if self.anim_counter > 1 / self.animation_speed:
-                self.frame_index = (self.frame_index + 1) % len(frames)
-                self.image = frames[self.frame_index]
-                self.anim_counter = 0
-        else:
-            self.image = frames[0]  # Стоячая поза
+# ===== Функция для скачивания файлов =====
+def download_file(url, save_path):
+    if os.path.exists(save_path):
+        return  # уже есть
+    try:
+        print(f"⬇️ Скачивание: {url}")
+        r = requests.get(url)
+        r.raise_for_status()
+        with open(save_path, "wb") as f:
+            f.write(r.content)
+        print(f"✅ Сохранено: {save_path}")
+    except Exception as e:
+        print(f"❌ Ошибка при скачивании {url}: {e}")
 
-        # Движение
-        if keys[pygame.K_a]: self.rect.x -= 5
-        if keys[pygame.K_d]: self.rect.x += 5
-        if keys[pygame.K_w]: self.rect.y -= 5
-        if keys[pygame.K_s]: self.rect.y += 5
+# ===== Скачивание слоев =====
+for layer in char_data["layers"]:
+    local_path = os.path.join(base_dir, "assets", layer["fileName"])
+    os.makedirs(os.path.dirname(local_path), exist_ok=True)
 
-player = Player()
-all_sprites = pygame.sprite.Group(player)
+    # Составляем URL на spritesheets
+    # base_url + путь к файлу из JSON
+    # Например: https://liberatedpixelcup.github.io/Universal-LPC-Spritesheet-Character-Generator/spritesheets/body/bodies/male/light.png
+    url = char_data["spritesheets"] + layer["fileName"]
+    download_file(url, local_path)
 
+# ===== Загрузка слоев в Pygame =====
+layers = []
+for layer in char_data["layers"]:
+    path = os.path.join(base_dir, "assets", layer["fileName"])
+    if not os.path.exists(path):
+        print(f"⚠️ Файл не найден: {path}")
+        continue
+    img = pygame.image.load(path).convert_alpha()
+    layers.append({
+        "image": img,
+        "zPos": layer["zPos"],
+        "name": layer["name"],
+        "parentName": layer["parentName"],
+        "animations": layer["supportedAnimations"]
+    })
+
+# Сортируем по zPos
+layers.sort(key=lambda x: x["zPos"])
+
+# ===== Функция отрисовки персонажа =====
+def render_character(surface, x, y):
+    for layer in layers:
+        surface.blit(layer["image"], (x, y))
+
+# ===== Простая анимация ходьбы =====
+walk_frames = [0, 5, 0, -5]
+walk_index = 0
+walk_timer = 0
+
+player_x, player_y = 300, 300
+player_speed = 5
+
+# ===== Основной цикл =====
 running = True
 while running:
+    dt = clock.tick(FPS) / 1000
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             running = False
-        if event.type == pygame.VIDEORESIZE:
-            screen = pygame.display.set_mode((event.w, event.h), pygame.RESIZABLE)
 
-    all_sprites.update()
+    keys = pygame.key.get_pressed()
+    moving = False
+    if keys[pygame.K_LEFT]:
+        player_x -= player_speed
+        moving = True
+    if keys[pygame.K_RIGHT]:
+        player_x += player_speed
+        moving = True
 
-    screen.fill((50, 50, 100))
-    all_sprites.draw(screen)
+    if moving:
+        walk_timer += dt
+        if walk_timer > 0.2:
+            walk_timer = 0
+            walk_index = (walk_index + 1) % len(walk_frames)
+    else:
+        walk_index = 0
+
+    screen.fill((100, 150, 200))
+    render_character(screen, player_x, player_y + walk_frames[walk_index])
     pygame.display.flip()
-    clock.tick(60)
 
 pygame.quit()
-sys.exit()
