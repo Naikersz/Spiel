@@ -131,7 +131,7 @@ class ModularCharacter:
         """Загружает базовые слои персонажа"""
         # Основное тело персонажа
         body_layer = CharacterLayer(
-            "game/assets/sprites/body/bodies/male/light.png", 
+            "game/assets/sprites/body/bodies/male/bodyMale.png", 
             "body", 
             z_pos=10
         )
@@ -188,7 +188,7 @@ class ModularCharacter:
 
         # Голова персонажа
         head_layer = CharacterLayer(
-            "game/assets/sprites/head/heads/human/male/light.png",
+            "game/assets/sprites/head/heads/human/male/headMale.png",
             "head", 
             z_pos=50
         )
