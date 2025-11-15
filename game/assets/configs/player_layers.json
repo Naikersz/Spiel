@@ -1,0 +1,73 @@
+{
+  "sprite_size": {
+    "w": 64,
+    "h": 64
+  },
+  "animations": {
+    "walk": {
+      "frames": 9,
+      "rows": {
+        "up": 8,
+        "left": 9,
+        "down": 10,
+        "right": 11
+      }
+    },
+    "idle": {
+      "frames": 1,
+      "rows": {
+        "up": 8,
+        "left": 9,
+        "down": 10,
+        "right": 11
+      }
+    }
+  },
+  "layers": [
+    {
+      "name": "body",
+      "file": "game/assets/sprites/body/bodies/male/bodyMale.png",
+      "z": 10
+    },
+    {
+      "name": "leather_armor",
+      "file": "game/assets/sprites/torso/torsoLeather.png",
+      "z": 20
+    },
+    {
+      "name": "pants",
+      "file": "game/assets/sprites/legs/hose/hoseLeather.png",
+      "z": 15
+    },
+    {
+      "name": "boots",
+      "file": "game/assets/sprites/feet/boots/bootsBrown.png",
+      "z": 18
+    },
+    {
+      "name": "gloves",
+      "file": "game/assets/sprites/arms/gloves/glovesLeather.png",
+      "z": 30
+    },
+    {
+      "name": "mantal",
+      "file": "game/assets/sprites/arms/shoulders/mantal/mantalLeather.png",
+      "z": 25
+    },
+    {
+      "name": "cuffs",
+      "file": "game/assets/sprites/arms/wrists/cuffs/cuffsLeather.png",
+      "z": 35
+    },
+    {
+      "name": "head",
+      "file": "game/assets/sprites/head/heads/human/male/headMale.png",
+      "z": 50
+    },
+    {
+      "name": "hat",
+      "file": "game/assets/sprites/head/heads/human/male/hut.png",
+      "z": 100
+    }
+  ]
+}
