@@ -15,6 +15,7 @@ class GameState(Enum):
     INVENTORY = "inventory"
     LOADING = "loading"
     CHARACTER_CREATION = "character_creation"
+    TOWN = "town"  # Состояние города
 
 
 class MenuButton:
@@ -29,7 +30,7 @@ class MenuButton:
         self.rect = None
         self.alpha = 255
         
-    def update_rect(self, x: int, width: int, height: int):
+    def update_rect(self, x: int, width: int, height: int = 0):
         """Обновляет прямоугольник кнопки"""
         text_surf = self.font.render(self.text, True, (255, 255, 255))
         text_rect = text_surf.get_rect(center=(x + width // 2, self.y_pos))
@@ -252,13 +253,32 @@ class MainMenu(BaseMenu):
     def setup_buttons(self):
         """Настройка кнопок главного меню"""
         self.buttons = []
-        self.add_button("Start Game", "start_game")
-        self.add_button("New Character", "character_creation")
-        self.add_button("Load Game", "load_game")
-        self.add_button("Settings", "open_settings")
-        self.add_button("Inventory", "open_inventory")
+        self.add_button("New Game", "new_game")
+        
+        # Проверяем наличие сохранений для кнопки "Continue"
+        has_saves = self._check_saves_exist()
+        if has_saves:
+            self.add_button("Continue", "continue_game")
+        
+        self.add_button("Create Character", "character_creation")
         self.add_button("Quit Game", "quit_game")
         self.update_buttons()
+    
+    def _check_saves_exist(self) -> bool:
+        """Проверяет наличие сохранений"""
+        try:
+            import os
+            base_path = os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+            from game.player.player_manager import PlayerManager
+            player_manager = PlayerManager(base_path)
+            all_characters = player_manager.get_all_characters()
+            return len(all_characters) > 0
+        except Exception:
+            return False
+    
+    def refresh_buttons(self):
+        """Обновляет кнопки (например, после создания персонажа)"""
+        self.setup_buttons()
     
     def draw(self):
         """Отрисовывает главное меню"""
@@ -386,6 +406,7 @@ class CharacterCreationMenu(BaseMenu):
         self.name_input_active = False
         self.classes_data = []
         self.class_images = {}
+        self._is_new_game = False  # Флаг: новая игра или просто создание персонажа
         self.load_classes_data()
         self.load_class_images()
         self.setup_ui()
@@ -727,16 +748,57 @@ class MenuManager:
         
         if new_state in self.menus:
             self.current_menu = self.menus[new_state]
+            # Обновляем кнопки главного меню при возврате (может появиться "Continue")
+            if new_state == GameState.MENU and isinstance(self.current_menu, MainMenu):
+                self.current_menu.refresh_buttons()
             self.current_menu.open_sound()
     
     def handle_action(self, action: str) -> bool:
         """Обрабатывает действие из меню"""
-        if action == "start_game":
-            self.change_state(GameState.PLAYING)
+        if action == "new_game":
+            # Новая игра - переход к созданию персонажа
+            # Помечаем, что это новая игра
+            if GameState.CHARACTER_CREATION in self.menus:
+                self.menus[GameState.CHARACTER_CREATION]._is_new_game = True
+            self.change_state(GameState.CHARACTER_CREATION)
+            return True
+        
+        elif action == "continue_game":
+            # Продолжить - загрузка сохранения
+            try:
+                from game.player.player_manager import PlayerManager
+            except ImportError:
+                import sys
+                import os
+                sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+                from game.player.player_manager import PlayerManager
+            
+            import os
+            base_path = os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+            player_manager = PlayerManager(base_path)
+            
+            # Получаем список всех персонажей
+            all_characters = player_manager.get_all_characters()
+            if all_characters:
+                # Загружаем первого доступного персонажа
+                first_char_name = list(all_characters.keys())[0]
+                hero = player_manager.load_character(first_char_name)
+                if hero:
+                    print(f"Character loaded: {first_char_name}")
+                    self.change_state(GameState.TOWN)
+                    return True
+            else:
+                print("No saved characters found")
+                # Если нет сохранений, возвращаемся в главное меню
+                self.change_state(GameState.MENU)
+                return False
+        
+        elif action == "start_game":
+            self.change_state(GameState.TOWN)
             return True
         
         elif action == "resume_game":
-            self.change_state(GameState.PLAYING)
+            self.change_state(GameState.TOWN)
             return True
         
         elif action == "save_game":
@@ -758,15 +820,102 @@ class MenuManager:
             return True
         
         elif action == "character_creation":
+            # Создать персонажа - переход к созданию (не новая игра)
+            # Помечаем, что это НЕ новая игра
+            if GameState.CHARACTER_CREATION in self.menus:
+                self.menus[GameState.CHARACTER_CREATION]._is_new_game = False
             self.change_state(GameState.CHARACTER_CREATION)
             return True
         
         elif action == "create_character":
-            # TODO: Реализовать создание персонажа
+            # Создание персонажа - для "Новая игра" переходит в TOWN, для "Создать персонажа" возвращает в меню
+            is_new_game = getattr(self.current_menu, '_is_new_game', False)
+            
             if hasattr(self.current_menu, 'selected_class') and self.current_menu.selected_class:
-                class_name = self.current_menu.selected_class.get('name', 'Unknown')
-                char_name = getattr(self.current_menu, 'character_name', 'Unknown')
-                print(f"Creating character: {char_name} as {class_name}")
+                try:
+                    from game.player.player_manager import PlayerManager
+                    from game.setup.new_game_setup import NewGameSetup
+                except ImportError:
+                    # Fallback для разных структур проекта
+                    import sys
+                    import os
+                    sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+                    from game.player.player_manager import PlayerManager
+                    from game.setup.new_game_setup import NewGameSetup
+                
+                import os
+                base_path = os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+                player_manager = PlayerManager(base_path)
+                
+                class_id = self.current_menu.selected_class.get('id', 'warrior')
+                char_name = getattr(self.current_menu, 'character_name', '').strip()
+                
+                if char_name:
+                    # Упрощенное создание персонажа как в Andreas
+                    try:
+                        # Используем PlayerInitializer для создания
+                        hero = player_manager.create_character(class_id, char_name)
+                        
+                        if not hero:
+                            # Если создание не удалось, создаем минимального персонажа
+                            hero = {
+                                "name": char_name,
+                                "class_id": class_id,
+                                "class_name": self.current_menu.selected_class.get('name', 'Unknown'),
+                                "level": 1,
+                                "experience": 0,
+                                "x": 100,
+                                "y": 100,
+                                "stats": {
+                                    "health": self.current_menu.selected_class.get("base_health", 100),
+                                    "max_health": self.current_menu.selected_class.get("base_health", 100),
+                                    "strength": self.current_menu.selected_class.get("base_strength", 10),
+                                    "intelligence": self.current_menu.selected_class.get("base_intelligence", 10),
+                                    "dexterity": self.current_menu.selected_class.get("base_dexterity", 10),
+                                    "speed": self.current_menu.selected_class.get("base_speed", 10)
+                                },
+                                "equipped": {}
+                            }
+                            # Сохраняем персонажа
+                            player_manager.set_current_character(hero)
+                            player_manager.save_current_character()
+                    except Exception as e:
+                        print(f"Error creating character, using fallback: {e}")
+                        import traceback
+                        traceback.print_exc()
+                        # Создаем минимального персонажа для тестирования
+                        hero = {
+                            "name": char_name,
+                            "class_id": class_id,
+                            "class_name": self.current_menu.selected_class.get('name', 'Unknown'),
+                            "level": 1,
+                            "experience": 0,
+                            "x": 100,
+                            "y": 100,
+                            "stats": {
+                                "health": self.current_menu.selected_class.get("base_health", 100),
+                                "max_health": self.current_menu.selected_class.get("base_health", 100),
+                                "strength": self.current_menu.selected_class.get("base_strength", 10),
+                                "intelligence": self.current_menu.selected_class.get("base_intelligence", 10),
+                                "dexterity": self.current_menu.selected_class.get("base_dexterity", 10),
+                                "speed": self.current_menu.selected_class.get("base_speed", 10)
+                            },
+                            "equipped": {}
+                        }
+                        player_manager.set_current_character(hero)
+                        player_manager.save_current_character()
+                    
+                    if hero:
+                        print(f"Character created: {char_name} as {self.current_menu.selected_class.get('name', 'Unknown')}")
+                        if is_new_game:
+                            # Новая игра - переходим в TOWN
+                            self.change_state(GameState.TOWN)
+                        else:
+                            # Создать персонажа - возвращаемся в главное меню
+                            self.change_state(GameState.MENU)
+                        return True
+                    else:
+                        print(f"Failed to create character: {char_name}")
             return False
         
         elif action == "main_menu":

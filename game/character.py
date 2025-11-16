@@ -92,35 +92,110 @@ class ModularCharacter:
         self.load_default_layers()
 
     def load_default_layers(self):
-        layers = [
-            ("body", "game/assets/sprites/body/bodies/male/light.png", 10),
-            ("head", "game/assets/sprites/head/heads/human/male/light.png", 50),
-            ("leather_armor", "game/assets/sprites/torso/torsoLeather.png", 20),
-            ("gloves", "game/assets/sprites/arms/gloves/glovesLeather.png", 30),
-            ("pants", "game/assets/sprites/legs/hose/hoseLeather.png", 15),
-            ("boots", "game/assets/sprites/feet/boots/bootsBrown.png", 18),
-            ("mantal", "game/assets/sprites/arms/shoulders/mantal/mantalLeather.png", 25),
-            ("cuffs", "game/assets/sprites/arms/wrists/cuffs/cuffsLeather.png", 35),
-            ("hut", "game/assets/sprites/head/heads/human/male/hut.png", 100),
+        # Пытаемся загрузить из player_layers.json
+        layers_config = self._load_layers_config()
+        
+        if layers_config:
+            # Загружаем из конфига
+            for layer_data in layers_config.get("layers", []):
+                name = layer_data.get("name")
+                file_path = layer_data.get("file")
+                z = layer_data.get("z", 0)
+                if name and file_path:
+                    self.layers[name] = CharacterLayer(file_path, name, z_pos=z)
+            # Создаем синоним "hut" для "hat" для совместимости
+            if "hat" in self.layers and "hut" not in self.layers:
+                self.layers["hut"] = self.layers["hat"]
+            # Видимые слои по умолчанию (body и head)
+            self.visible_layers = {"body", "head"}
+        else:
+            # Fallback к старым слоям
+            layers = [
+                ("body", "game/assets/sprites/body/bodies/male/bodyMale.png", 10),
+                ("head", "game/assets/sprites/head/heads/human/male/headMale.png", 50),
+                ("leather_armor", "game/assets/sprites/torso/torsoLeather.png", 20),
+                ("gloves", "game/assets/sprites/arms/gloves/glovesLeather.png", 30),
+                ("pants", "game/assets/sprites/legs/hose/hoseLeather.png", 15),
+                ("boots", "game/assets/sprites/feet/boots/bootsBrown.png", 18),
+                ("mantal", "game/assets/sprites/arms/shoulders/mantal/mantalLeather.png", 25),
+                ("cuffs", "game/assets/sprites/arms/wrists/cuffs/cuffsLeather.png", 35),
+                ("hut", "game/assets/sprites/head/heads/human/male/hut.png", 100),
+                ("hat", "game/assets/sprites/head/heads/human/male/hut.png", 100),  # Синоним для hut
+            ]
+            for name, path, z in layers:
+                self.layers[name] = CharacterLayer(path, name, z_pos=z)
+            self.visible_layers = {"body", "head"}
+    
+    def _load_layers_config(self):
+        """Загружает конфигурацию слоев из player_layers.json"""
+        import json
+        possible_paths = [
+            "game/assets/configs/player_layers.json",
+            "assets/configs/player_layers.json",
+            os.path.join(os.path.dirname(os.path.dirname(__file__)), "assets", "configs", "player_layers.json")
         ]
-        for name, path, z in layers:
-            self.layers[name] = CharacterLayer(path, name, z_pos=z)
-        self.visible_layers = {"body", "head"}
+        
+        for path in possible_paths:
+            if os.path.exists(path):
+                try:
+                    with open(path, "r", encoding="utf-8") as f:
+                        return json.load(f)
+                except Exception as e:
+                    print(f"Error loading player_layers.json from {path}: {e}")
+        
+        return None
 
     def toggle_clothing(self, item_name: str, base_layer: str = None) -> bool:
+        """
+        Переключает видимость предмета одежды.
+        
+        Args:
+            item_name: Имя предмета одежды
+            base_layer: Базовый слой (для совместимости, не используется для большинства предметов)
+        
+        Returns:
+            bool: True если надето, False если снято
+        """
         if item_name not in self.layers:
             print(f"Предмет не найден: {item_name}")
             return False
+        
+        # Определяем, какие слои должны оставаться видимыми
+        # Базовые слои, которые никогда не должны скрываться
+        base_layers = {"body", "head"}
+        
+        # Предметы, которые являются дополнительными слоями (не заменяют базовые)
+        additional_layers = {"leather_armor", "hut", "hat", "gloves", "pants", "boots", "mantal", "cuffs"}
+        
         if item_name in self.visible_layers:
+            # Снимаем предмет
             self.visible_layers.remove(item_name)
-            if base_layer and base_layer in self.layers:
-                self.visible_layers.add(base_layer)
+            # Убеждаемся, что базовые слои остаются видимыми
+            if item_name in additional_layers:
+                # Для дополнительных слоев базовые остаются
+                if base_layer and base_layer in self.layers and base_layer not in self.visible_layers:
+                    self.visible_layers.add(base_layer)
             print(f"Снято: {item_name}")
             return False
         else:
-            if base_layer and base_layer in self.visible_layers:
-                self.visible_layers.remove(base_layer)
+            # Надеваем предмет
+            # Для дополнительных слоев базовые остаются видимыми
+            if item_name in additional_layers:
+                # Не удаляем базовый слой - дополнительные слои идут поверх
+                if base_layer and base_layer not in self.visible_layers:
+                    self.visible_layers.add(base_layer)
+            else:
+                # Для предметов, которые заменяют базовый слой (если такие есть)
+                if base_layer and base_layer in self.visible_layers:
+                    self.visible_layers.remove(base_layer)
+            
             self.visible_layers.add(item_name)
+            
+            # Убеждаемся, что базовые слои всегда видимы
+            for base in base_layers:
+                if base in self.layers and base not in self.visible_layers:
+                    self.visible_layers.add(base)
+            
             print(f"Надето: {item_name}")
             return True
 

@@ -1,56 +1,31 @@
 """
 Main entry point for Spiel game
+Интегрирован с новой системой инициализации
 """
 import warnings
 import os
+import sys
+
+# Добавляем родительскую директорию в путь для корректных импортов
+current_dir = os.path.dirname(os.path.abspath(__file__))
+parent_dir = os.path.dirname(current_dir)
+if parent_dir not in sys.path:
+    sys.path.insert(0, parent_dir)
 
 # Suppress pkg_resources deprecation warning from pygame BEFORE importing pygame
 warnings.filterwarnings("ignore", category=UserWarning, message=".*pkg_resources.*")
 warnings.filterwarnings("ignore", message=".*pkg_resources.*")
 
-import pygame
-from game.menu_system import MenuManager, GameState
+from game.core.game_launcher import GameLauncher
 
 def main():
     """Main game loop"""
-    pygame.init()
+    # Определяем базовый путь (на уровень выше папки game)
+    base_path = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
     
-    # Fullscreen mode
-    screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
-    pygame.display.set_caption("Spiel - Roguelike Adventure")
-    clock = pygame.time.Clock()
-    
-    # Initialize menu system
-    menu_manager = MenuManager(screen)
-    
-    running = True
-    while running:
-        dt = clock.tick(60) / 1000.0
-        
-        # Handle events
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                running = False
-                break
-            
-            # Handle menu events
-            action = menu_manager.handle_event(event)
-            if action:
-                if action == "quit_game":
-                    running = False
-                    break
-                else:
-                    menu_manager.handle_action(action)
-        
-        # Update menu
-        menu_manager.update(dt)
-        
-        # Draw menu
-        menu_manager.draw()
-        
-        pygame.display.flip()
-    
-    pygame.quit()
+    # Создаем и запускаем лаунчер
+    launcher = GameLauncher(base_path)
+    launcher.run()
 
 if __name__ == "__main__":
     main()
