@@ -1,0 +1,36 @@
+[
+    {
+        "id": "magic_staff",
+        "name": "Magic Staff",
+        "item_type": "weapon",
+        "item_level": 1,
+        "min_player_level": 1,
+        "min_intelligence": 5,
+        "attack_power": 2,
+        "attack_speed": 0.8,
+        "magic_power": 5,
+        "enchantments": []
+    },
+    {
+        "id": "cloth_robe",
+        "name": "Cloth Robe",
+        "item_type": "chest",
+        "item_level": 1,
+        "min_player_level": 1,
+        "min_intelligence": 3,
+        "defence": 2,
+        "magic_defence": 4,
+        "enchantments": []
+    },
+    {
+        "id": "leather_armor",
+        "name": "Leather Armor",
+        "item_type": "chest",
+        "item_level": 1,
+        "min_player_level": 1,
+        "min_dexterity": 3,
+        "defence": 4,
+        "magic_defence": 2,
+        "enchantments": []
+    }
+]

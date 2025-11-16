@@ -1,5 +1,5 @@
 {
-    "tile_size": 64,
+    "tile_size": 32,
     "room_settings": {
         "min_room_width": 10,
         "max_room_width": 20,
@@ -40,7 +40,6 @@
                 "game/assets/tiles/brick_dark2.png",
                 "game/assets/tiles/brick_dark3.png",
                 "game/assets/tiles/brick_dark4.png",
-                "game/assets/tiles/brick_dark5.png"
             ]
         },
         "cobweb": {
