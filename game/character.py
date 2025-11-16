@@ -120,7 +120,7 @@ class ModularCharacter:
                 ("mantal", "game/assets/sprites/arms/shoulders/mantal/mantalLeather.png", 25),
                 ("cuffs", "game/assets/sprites/arms/wrists/cuffs/cuffsLeather.png", 35),
                 ("hut", "game/assets/sprites/head/heads/human/male/hut.png", 100),
-                ("hat", "game/assets/sprites/head/heads/human/male/hut.png", 100),  # Синоним для hut
+                ("hat", "game/assets/sprites/head/heads/human/male/hut.png", 100), 
             ]
             for name, path, z in layers:
                 self.layers[name] = CharacterLayer(path, name, z_pos=z)

@@ -113,14 +113,23 @@ class GameInitializer:
                 
                 if hasattr(self.game_instance, 'player') and self.game_instance.player:
                     # Проверка коллизий с картой
-                    new_x = self.game_instance.player.x + dx
-                    new_y = self.game_instance.player.y + dy
+                    player = self.game_instance.player
+                    new_x = player.x + dx
+                    new_y = player.y + dy
                     
-                    if self.tilemap and self.tilemap.is_walkable(new_x, new_y):
-                        self.game_instance.player.move(dx, dy)
-                    elif not self.tilemap:
+                    # Размер спрайта игрока (64x64 согласно player_layers.json)
+                    sprite_width = 64
+                    sprite_height = 64
+                    
+                    if self.tilemap:
+                        # Проверяем движение (игрок = 1 тайл, центр спрайта)
+                        # Используем абсолютные координаты (мировое пространство)
+                        if self.tilemap.is_walkable_rect(new_x, new_y, sprite_width, sprite_height):
+                            player.move(dx, dy)
+                        # Если коллизия, не двигаем
+                    else:
                         # Если карты нет, просто двигаем
-                        self.game_instance.player.move(dx, dy)
+                        player.move(dx, dy)
                     
                     # Сохраняем позицию игрока для сохранения
                     # TODO: Реализовать периодическое сохранение позиции
@@ -148,7 +157,7 @@ class GameInitializer:
             from ..tilemap import Tilemap
             
             # Генерируем карту подземелья
-            self.tilemap = Tilemap(width=100, height=100, tile_size=32)
+            self.tilemap = Tilemap(width=100, height=100, tile_size=64)
             self.tilemap.generate()
             
             # Определяем позицию спавна
@@ -171,8 +180,26 @@ class GameInitializer:
             if spawn_x == 100 and spawn_y == 100 and self.tilemap.rooms:
                 first_room = self.tilemap.rooms[0]
                 room_x, room_y, room_w, room_h = first_room
-                spawn_x = (room_x + room_w // 2) * self.tilemap.tile_size
-                spawn_y = (room_y + room_h // 2) * self.tilemap.tile_size
+                # Позиция спавна: центр комнаты минус половина спрайта (64x64)
+                # Чтобы игрок был точно в центре тайла пола
+                spawn_x = (room_x + room_w // 2) * self.tilemap.tile_size - 32
+                spawn_y = (room_y + room_h // 2) * self.tilemap.tile_size - 32
+                
+                # Гарантируем, что спавн на проходимом тайле
+                if not self.tilemap.is_walkable_rect(spawn_x, spawn_y, 64, 64):
+                    # Ищем первую проходимую позицию в комнате
+                    found_spawn = False
+                    for ry in range(room_y + 1, room_y + room_h - 1):
+                        for rx in range(room_x + 1, room_x + room_w - 1):
+                            test_x = rx * self.tilemap.tile_size - 32
+                            test_y = ry * self.tilemap.tile_size - 32
+                            if self.tilemap.is_walkable_rect(test_x, test_y, 64, 64):
+                                spawn_x = test_x
+                                spawn_y = test_y
+                                found_spawn = True
+                                break
+                        if found_spawn:
+                            break
             
             # Создаем простой объект для хранения игрового состояния
             class GameState:

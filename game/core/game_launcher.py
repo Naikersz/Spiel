@@ -42,7 +42,12 @@ class GameLauncher:
                             self.running = False
                             break
                         else:
-                            menu_manager.handle_action(action)
+                            result = menu_manager.handle_action(action)
+                            # Отладка: выводим действие и результат
+                            if result:
+                                print(f"Action '{action}' handled successfully")
+                            else:
+                                print(f"Action '{action}' returned False")
             
             # Обновление
             self.initializer.update(dt)
