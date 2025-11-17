@@ -49,9 +49,13 @@ class LevelSelectionScene:
     # --------------------------------------------------------
     def start_battle(self, level_type, level_number):
         print(f"⚔️ {level_type} {level_number} gestartet!")
-        # TODO: Hier später zur BattleScene wechseln
-        # from scenes.battle_scene import BattleScene
-        # return BattleScene(self.slot_index, level_type, level_number)
+        # Starte Battle Scene nur für Feld 1 und weiter
+        if level_type == "Feld":
+            from scenes.battle_scene import BattleScene
+            return BattleScene(self.slot_index, level_type, level_number)
+        else:
+            # Cave noch nicht implementiert
+            print(f"Cave {level_number} noch nicht implementiert")
 
     def back_to_town(self):
         print("⬅ Zurück zur Stadt")
