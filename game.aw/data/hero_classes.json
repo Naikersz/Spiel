@@ -8,9 +8,9 @@
         "base_dexterity": 10,
         "base_speed": 10,
         "starter_items": [
-            "Iron_Sword",
-            "Iron_Chestplate",
-            "Iron_Pants"
+            "iron_sword",
+            "chainmail_tunic",
+            "chain_pants"
         ]
     },
     {
@@ -22,9 +22,9 @@
         "base_dexterity": 10,
         "base_speed": 12,
         "starter_items": [
-            "Magic_Staff",
-            "Cloth_Robe",
-            "Cloth_Pants"
+            "magic_staff",
+            "silk_robe",
+            "cloth_pants"
         ]
     },
     {
@@ -36,9 +36,9 @@
         "base_dexterity": 20,
         "base_speed": 20,
         "starter_items": [
-            "Dagger",
-            "Leather_Armor",
-            "Leather_Pants"
+            "dagger",
+            "leather_jerkin",
+            "leather_pants"
         ]
     },
     {
@@ -50,9 +50,9 @@
         "base_dexterity": 12,
         "base_speed": 14,
         "starter_items": [
-            "Healing_Staff",
-            "Light_Robe",
-            "Linen_Pants"
+            "magic_staff",
+            "silk_robe",
+            "cloth_pants"
         ]
     }
 ]
