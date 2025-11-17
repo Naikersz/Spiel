@@ -3,6 +3,7 @@ Game Initializer - основная точка входа инициализац
 Интегрируется с MenuManager и существующими системами
 """
 import os
+import math
 import pygame
 from typing import Optional
 from .game_state_manager import GameStateManager
@@ -37,20 +38,24 @@ class GameInitializer:
         self.camera_x = 0
         self.camera_y = 0
         
+        # Кнопка поворота карты
+        self.rotate_button_rect = None
+        self.rotate_button_size = 40
+        
         self._initialize_display()
         self._initialize_menu_system()
         self._initialize_game()
     
     def _initialize_display(self):
         """Инициализирует дисплей"""
-        fullscreen = self.state_manager.get_setting("fullscreen", True)
-        resolution = self.state_manager.get_setting("resolution", {"width": 1920, "height": 1080})
+        fullscreen = self.state_manager.get_setting("fullscreen", False)  # По умолчанию не полноэкранный
+        resolution = self.state_manager.get_setting("resolution", {"width": 1280, "height": 720})
         
         if fullscreen:
             self.screen = pygame.display.set_mode((0, 0), pygame.FULLSCREEN)
         else:
-            width = resolution.get("width", 1920)
-            height = resolution.get("height", 1080)
+            width = resolution.get("width", 1280)
+            height = resolution.get("height", 720)
             self.screen = pygame.display.set_mode((width, height))
         
         pygame.display.set_caption("Spiel - Roguelike Adventure")
@@ -261,7 +266,28 @@ class GameInitializer:
                     # Пауза
                     self.menu_manager.change_state(GameState.PAUSED)
                     return None
-                # Отладочные кнопки для переключения одежды (1-7)
+                elif event.key == pygame.K_r:
+                    # Регенерация карты
+                    if self.tilemap:
+                        import random
+                        seed = random.randint(0, 1000000)
+                        self.tilemap.regenerate(seed=seed)
+                        print(f"Карта регенерирована с seed: {seed}")
+                elif event.key == pygame.K_g:
+                    # Поворот карты на 90°
+                    if self.tilemap:
+                        self.tilemap.rotate_map()
+                        print(f"Карта повернута на {self.tilemap.camera_angle * 90}°")
+            
+            # Обработка клика по кнопке поворота
+            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                if self.rotate_button_rect and self.rotate_button_rect.collidepoint(event.pos):
+                    if self.tilemap:
+                        self.tilemap.rotate_map()
+                        print(f"Карта повернута на {self.tilemap.camera_angle * 90}°")
+            
+            # Отладочные кнопки для переключения одежды (1-7)
+            if event.type == pygame.KEYDOWN:
                 if self.game_instance and hasattr(self.game_instance, 'player') and self.game_instance.player:
                     if event.key == pygame.K_1:
                         # Шляпа - дополнительный слой, голова остается видимой
@@ -339,6 +365,44 @@ class GameInitializer:
                     hp_ratio = self.game_instance.player.hp / self.game_instance.player.max_hp
                     pygame.draw.rect(self.screen, (100, 0, 0), (10, 10, 200, 20))
                     pygame.draw.rect(self.screen, (0, 200, 0), (10, 10, 200 * hp_ratio, 20))
+                
+                # Рисуем кнопку поворота карты (правый верхний угол)
+                if self.screen:
+                    screen_width = self.screen.get_width()
+                    button_x = screen_width - self.rotate_button_size - 10
+                    button_y = 10
+                    self.rotate_button_rect = pygame.Rect(button_x, button_y, self.rotate_button_size, self.rotate_button_size)
+                    
+                    # Рисуем круглую кнопку
+                    pygame.draw.circle(self.screen, (60, 60, 80), 
+                                     (button_x + self.rotate_button_size // 2, 
+                                      button_y + self.rotate_button_size // 2),
+                                     self.rotate_button_size // 2)
+                    pygame.draw.circle(self.screen, (100, 100, 120), 
+                                     (button_x + self.rotate_button_size // 2, 
+                                      button_y + self.rotate_button_size // 2),
+                                     self.rotate_button_size // 2, 2)
+                    
+                    # Рисуем стрелку поворота ↻
+                    center_x = button_x + self.rotate_button_size // 2
+                    center_y = button_y + self.rotate_button_size // 2
+                    # Простая стрелка в виде дуги со стрелкой
+                    radius = self.rotate_button_size // 3
+                    for i in range(8):
+                        angle = i * math.pi / 4
+                        x = int(center_x + radius * math.cos(angle))
+                        y = int(center_y + radius * math.sin(angle))
+                        pygame.draw.circle(self.screen, (200, 200, 200), (x, y), 2)
+                    
+                    # Стрелка в конце дуги
+                    arrow_angle = math.pi / 4
+                    arrow_x = int(center_x + radius * math.cos(arrow_angle))
+                    arrow_y = int(center_y + radius * math.sin(arrow_angle))
+                    pygame.draw.polygon(self.screen, (200, 200, 200), [
+                        (arrow_x, arrow_y),
+                        (arrow_x - 3, arrow_y - 3),
+                        (arrow_x + 3, arrow_y - 3)
+                    ])
         else:
             # Отрисовываем меню
             self.menu_manager.draw()

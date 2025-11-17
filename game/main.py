@@ -13,8 +13,13 @@ if parent_dir not in sys.path:
     sys.path.insert(0, parent_dir)
 
 # Suppress pkg_resources deprecation warning from pygame BEFORE importing pygame
-warnings.filterwarnings("ignore", category=UserWarning, message=".*pkg_resources.*")
-warnings.filterwarnings("ignore", message=".*pkg_resources.*")
+# Фильтруем все предупреждения о pkg_resources (deprecated API)
+PKG_RESOURCES_PATTERN = ".*pkg_resources.*"
+warnings.filterwarnings("ignore", category=UserWarning, message=PKG_RESOURCES_PATTERN)
+warnings.filterwarnings("ignore", message=PKG_RESOURCES_PATTERN)
+warnings.filterwarnings("ignore", category=DeprecationWarning, message=PKG_RESOURCES_PATTERN)
+# Также подавляем через переменную окружения для pygame
+os.environ['PYGAME_HIDE_SUPPORT_PROMPT'] = '1'
 
 from game.core.game_launcher import GameLauncher
 
