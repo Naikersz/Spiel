@@ -47,6 +47,8 @@ class TownScene:
 
     def fight(self):
         print("⚔️ Kampf gestartet!")
+        from scenes.level_selection_scene import LevelSelectionScene
+        return LevelSelectionScene(self.slot_index)
 
     def exit_to_menu(self):
         print("⬅ Zurück zum Hauptmenü")
