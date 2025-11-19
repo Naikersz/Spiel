@@ -275,15 +275,43 @@ class GameInitializer:
                         print(f"Карта регенерирована с seed: {seed}")
                 elif event.key == pygame.K_g:
                     # Поворот карты на 90°
-                    if self.tilemap:
-                        self.tilemap.rotate_map()
+                    if self.tilemap and self.game_instance and hasattr(self.game_instance, 'player') and self.game_instance.player:
+                        screen_width, screen_height = self.screen.get_size() if self.screen else (1280, 720)
+                        new_px, new_py, new_cx, new_cy = self.tilemap.rotate_map(
+                            player_x=self.game_instance.player.x,
+                            player_y=self.game_instance.player.y,
+                            camera_x=self.camera_x,
+                            camera_y=self.camera_y,
+                            screen_width=screen_width,
+                            screen_height=screen_height
+                        )
+                        if new_px is not None and new_py is not None:
+                            self.game_instance.player.x = new_px
+                            self.game_instance.player.y = new_py
+                        if new_cx is not None and new_cy is not None:
+                            self.camera_x = new_cx
+                            self.camera_y = new_cy
                         print(f"Карта повернута на {self.tilemap.camera_angle * 90}°")
             
             # Обработка клика по кнопке поворота
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 if self.rotate_button_rect and self.rotate_button_rect.collidepoint(event.pos):
-                    if self.tilemap:
-                        self.tilemap.rotate_map()
+                    if self.tilemap and self.game_instance and hasattr(self.game_instance, 'player') and self.game_instance.player:
+                        screen_width, screen_height = self.screen.get_size() if self.screen else (1280, 720)
+                        new_px, new_py, new_cx, new_cy = self.tilemap.rotate_map(
+                            player_x=self.game_instance.player.x,
+                            player_y=self.game_instance.player.y,
+                            camera_x=self.camera_x,
+                            camera_y=self.camera_y,
+                            screen_width=screen_width,
+                            screen_height=screen_height
+                        )
+                        if new_px is not None and new_py is not None:
+                            self.game_instance.player.x = new_px
+                            self.game_instance.player.y = new_py
+                        if new_cx is not None and new_cy is not None:
+                            self.camera_x = new_cx
+                            self.camera_y = new_cy
                         print(f"Карта повернута на {self.tilemap.camera_angle * 90}°")
             
             # Отладочные кнопки для переключения одежды (1-7)

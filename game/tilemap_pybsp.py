@@ -927,12 +927,121 @@ class TilemapPyBSP:
         
         return rotated_mask
     
-    def rotate_map(self):
-        """Поворачивает карту на 90° по часовой стрелке"""
+    def _rotate_map_data_clockwise(self):
+        """Поворачивает всю карту (map_data) на 90° по часовой стрелке"""
+        old_data = self.map_data
+        old_width = self.width
+        old_height = self.height
+        
+        self.width, self.height = old_height, old_width
+        self.map_data = [
+            [old_data[old_height - 1 - j][i] for j in range(old_height)]
+            for i in range(old_width)
+        ]
+    
+    def _rotate_coordinates_clockwise(self, px: int, py: int, old_width: int, old_height: int) -> Tuple[int, int]:
+        """
+        Преобразует координаты точки при повороте карты на 90° по часовой стрелке
+        
+        Args:
+            px: X координата в пикселях (старая система координат)
+            py: Y координата в пикселях (старая система координат)
+            old_width: Старая ширина карты в тайлах (не используется, но оставлен для консистентности)
+            old_height: Старая высота карты в тайлах
+            
+        Returns:
+            Tuple[int, int]: Новые координаты (new_px, new_py) в пикселях
+        """
+        tile_size = self.tile_size
+        
+        # Преобразуем пиксели в тайлы и смещение внутри тайла
+        old_tile_x = px // tile_size
+        old_tile_y = py // tile_size
+        offset_x = px % tile_size
+        offset_y = py % tile_size
+        
+        # Поворот координат в тайлах: (x, y) → (old_height - 1 - y, x)
+        new_tile_x = old_height - 1 - old_tile_y
+        new_tile_y = old_tile_x
+        
+        # При повороте смещения тоже меняются:
+        # Старое смещение по X становится новым смещением по Y
+        # Старое смещение по Y становится обратным смещением по X
+        new_offset_x = offset_y
+        new_offset_y = tile_size - 1 - offset_x
+        
+        # Преобразуем обратно в пиксели
+        new_px = new_tile_x * tile_size + new_offset_x
+        new_py = new_tile_y * tile_size + new_offset_y
+        
+        return (new_px, new_py)
+    
+    def rotate_map(self, player_x: Optional[int] = None, player_y: Optional[int] = None,
+                   camera_x: Optional[int] = None, camera_y: Optional[int] = None,
+                   screen_width: Optional[int] = None, screen_height: Optional[int] = None) -> Tuple[Optional[int], Optional[int], Optional[int], Optional[int]]:
+        """
+        Поворачивает всю карту на 90° по часовой стрелке и преобразует координаты
+        
+        Args:
+            player_x: Текущая X координата игрока в пикселях (опционально)
+            player_y: Текущая Y координата игрока в пикселях (опционально)
+            camera_x: Текущая X координата камеры в пикселях (опционально)
+            camera_y: Текущая Y координата камеры в пикселях (опционально)
+            screen_width: Ширина экрана в пикселях (опционально, для ограничения камеры)
+            screen_height: Высота экрана в пикселях (опционально, для ограничения камеры)
+            
+        Returns:
+            Tuple[Optional[int], Optional[int], Optional[int], Optional[int]]:
+            (new_player_x, new_player_y, new_camera_x, new_camera_y) или None если не переданы
+        """
+        # Сохраняем старые размеры для преобразования координат
+        old_width = self.width
+        old_height = self.height
+        
         self.camera_angle = (self.camera_angle + 1) % 4
-        # Очищаем кэш тайлов стен при повороте
+        
+        # 1. Поворачиваем саму карту
+        self._rotate_map_data_clockwise()
+        
+        # 2. Очищаем кэши
         self.cached_wall_tiles.clear()
-        logger.info(f"Карта повернута на {self.camera_angle * 90}°")
+        self.scaled_cache.clear()
+        
+        # 3. Преобразуем координаты игрока и камеры
+        new_player_x = None
+        new_player_y = None
+        new_camera_x = None
+        new_camera_y = None
+        
+        if player_x is not None and player_y is not None:
+            new_player_x, new_player_y = self._rotate_coordinates_clockwise(
+                player_x, player_y, old_width, old_height
+            )
+            # Ограничиваем координаты игрока границами новой карты
+            max_x = (self.width * self.tile_size) - 1
+            max_y = (self.height * self.tile_size) - 1
+            new_player_x = max(0, min(new_player_x, max_x))
+            new_player_y = max(0, min(new_player_y, max_y))
+        
+        if camera_x is not None and camera_y is not None:
+            new_camera_x, new_camera_y = self._rotate_coordinates_clockwise(
+                camera_x, camera_y, old_width, old_height
+            )
+            # Ограничиваем координаты камеры границами новой карты
+            if screen_width and screen_height:
+                max_camera_x = max(0, (self.width * self.tile_size) - screen_width)
+                max_camera_y = max(0, (self.height * self.tile_size) - screen_height)
+                new_camera_x = max(0, min(new_camera_x, max_camera_x))
+                new_camera_y = max(0, min(new_camera_y, max_camera_y))
+            else:
+                max_camera_x = (self.width * self.tile_size) - 1
+                max_camera_y = (self.height * self.tile_size) - 1
+                new_camera_x = max(0, min(new_camera_x, max_camera_x))
+                new_camera_y = max(0, min(new_camera_y, max_camera_y))
+        
+        logger.info(f"Карта физически повернута на {self.camera_angle * 90}° (по часовой)")
+        
+        return (new_player_x, new_player_y, new_camera_x, new_camera_y)
     
     def _determine_tile_type_by_mask(self, mask: int) -> str:
         """
