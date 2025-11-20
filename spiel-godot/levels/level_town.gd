@@ -47,6 +47,6 @@ func _spawn_player_in_first_room() -> void:
 	for y in range(dungeon.map_height_tiles):
 		for x in range(dungeon.map_width_tiles):
 			if dungeon.is_walkable_tile(Vector2i(x, y)):
-				var world_pos sssssssssssssss= dungeon.map_to_local(Vector2i(x, y))
+				var world_pos = dungeon.map_to_local(Vector2i(x, y))
 				player.global_position = world_pos
 				return

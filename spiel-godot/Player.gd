@@ -67,6 +67,7 @@ var last_facing: String = "down"
 func _ready() -> void:
 	# Инициализируем все части одежды
 	_initialize_clothing()
+	$Camera2D.make_current()
 	
 	# Инициализируем с idle анимацией
 	_play_animation("idle", last_facing)
