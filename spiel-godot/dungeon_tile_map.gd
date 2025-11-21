@@ -19,7 +19,7 @@ DungeonTileMap.gd
 """
 
 # Для Godot 4.x
-const SOURCE_ID_WALL := 0  # ID источника тайлов для стен
+const SOURCE_ID_WALL := 4  # ID источника тайлов для стен
 const SOURCE_ID_FLOOR := 1  # ID источника тайлов для пола (второй тайлсет)
 const TILE_FLOOR := Vector2i(10, 3)  # Координаты тайла пола (из второго тайлсета)
 
