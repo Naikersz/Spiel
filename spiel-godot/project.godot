@@ -19,6 +19,10 @@ config/icon="res://icon.svg"
 
 window/stretch/mode="viewport"
 
+[importer_defaults]
+
+image={}
+
 [input]
 
 move_right={
