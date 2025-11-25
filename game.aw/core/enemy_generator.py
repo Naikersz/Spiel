@@ -7,6 +7,7 @@ import random
 import os
 from typing import List, Dict, Any
 
+from core.dev_settings import load_dev_settings
 
 class EnemyGenerator:
     def __init__(self, data_path: str = None):
@@ -23,6 +24,20 @@ class EnemyGenerator:
         self.data_path = data_path
         self.monsters = self._load_monsters()
         self.enchantments = self._load_enchantments()
+
+        # Dev-Settings laden
+        self.dev_settings = load_dev_settings()
+    
+    def _pick_monster_in_level_range(self, min_level: int, max_level: int):
+        candidates = [
+            m for m in self.monsters
+            if min_level <= m.get("level", 1) <= max_level
+        ]
+        if not candidates:
+            candidates = self.monsters
+        if not candidates:
+            return None
+        return random.choice(candidates)
     
     def _load_monsters(self) -> List[Dict[str, Any]]:
         """Lädt die Monster-Daten aus monster.json"""
@@ -136,7 +151,9 @@ class EnemyGenerator:
         
         return stats
     
-    def generate_enemy(self, monster_id: str = None, enchantment_count: int = 0) -> Dict[str, Any]:
+    def generate_enemy(self, monster_id: str = None, enchantment_count: int = 0,
+                       min_level: int = None, max_level: int = None) -> Dict[str, Any]:
+
         """
         Generiert einen einzelnen Gegner
         
@@ -154,10 +171,17 @@ class EnemyGenerator:
                 print(f"Monster '{monster_id}' nicht gefunden, verwende zufälliges Monster")
                 monster = random.choice(self.monsters) if self.monsters else None
         else:
-            monster = random.choice(self.monsters) if self.monsters else None
-        
-        if not monster:
-            raise ValueError("Keine Monster verfügbar")
+            if min_level is not None or max_level is not None:
+                min_lvl = min_level if min_level is not None else 1
+                max_lvl = max_level if max_level is not None else 999
+                monster = self._pick_monster_in_level_range(min_lvl, max_lvl)
+            else:
+                if min_level is not None or max_level is not None:
+                    min_lvl = min_level if min_level is not None else 1
+                    max_lvl = max_level if max_level is not None else 999
+                    monster = self._pick_monster_in_level_range(min_lvl, max_lvl)
+                else:
+                    monster = random.choice(self.monsters) if self.monsters else None
         
         # Erstelle eine Kopie des Monsters
         enemy = monster.copy()
@@ -257,42 +281,82 @@ class EnemyGenerator:
         
         return final_stats, enchantment_bonuses
     
-    def generate_field_enemies(self, field_number: int) -> List[Dict[str, Any]]:
+    def generate_field_enemies(self, field_number: int, config=None) -> List[Dict[str, Any]]:
         """
         Generiert Gegner für ein Feld
-        
-        Args:
-            field_number: Nummer des Feldes (1, 2, 3, ...)
-            
-        Returns:
-            Liste von Gegnern
+
+        Wenn config != None ist, werden die Dev-Settings für dieses Feld verwendet.
         """
         enemies = []
-        
-        # Feld 1: 3 normale Gegner, 1 mit 1-3 Verzauberungen, 1 mit 4-6 Verzauberungen
+
+        # Dev-Konfiguration aktiv
+        if config is not None:
+            enemy_count = max(1, int(config.get("enemy_count", 5)))
+            ench_min = int(config.get("enchantment_min", 0))
+            ench_max = int(config.get("enchantment_max", 0))
+            lvl_min = int(config.get("monster_level_min", 1))
+            lvl_max = int(config.get("monster_level_max", 100))
+
+            if ench_max < ench_min:
+                ench_max = ench_min
+
+            for _ in range(enemy_count):
+                if ench_max > 0:
+                    enchant_count = random.randint(ench_min, ench_max)
+                else:
+                    enchant_count = 0
+
+                enemy = self.generate_enemy(
+                    enchantment_count=enchant_count,
+                    min_level=lvl_min,
+                    max_level=lvl_max,
+                )
+                enemies.append(enemy)
+
+            return enemies
+
+        # Standard-Verhalten, wenn keine config übergeben wurde
         if field_number == 1:
             # 3 normale Gegner (ohne Verzauberungen)
             for _ in range(3):
                 enemies.append(self.generate_enemy(enchantment_count=0))
-            
+
             # 1 Gegner mit 1-3 Verzauberungen
             enchant_count = random.randint(1, 3)
             enemies.append(self.generate_enemy(enchantment_count=enchant_count))
-            
+
             # 1 Gegner mit 4-6 Verzauberungen
             enchant_count = random.randint(4, 6)
             enemies.append(self.generate_enemy(enchantment_count=enchant_count))
-        
-        # TODO: Weitere Felder können hier konfiguriert werden
         else:
             # Standard: 5 normale Gegner für andere Felder
             for _ in range(5):
                 enemies.append(self.generate_enemy(enchantment_count=0))
-        
+
         return enemies
 
 
-def generate_enemies_for_field(field_number: int) -> List[Dict[str, Any]]:
+        # --- normales Verhalten, wenn Dev-Mode AUS ist ---
+
+        # Feld 1: 3 normale Gegner, 1 mit 1-3 Verzauberungen, 1 mit 4-6 Verzauberungen
+        if field_number == 1:
+            for _ in range(3):
+                enemies.append(self.generate_enemy(enchantment_count=0))
+
+            enchant_count = random.randint(1, 3)
+            enemies.append(self.generate_enemy(enchantment_count=enchant_count))
+
+            enchant_count = random.randint(4, 6)
+            enemies.append(self.generate_enemy(enchantment_count=enchant_count))
+        else:
+            for _ in range(5):
+                enemies.append(self.generate_enemy(enchantment_count=0))
+
+        return enemies
+
+
+
+def generate_enemies_for_field(field_number: int, config=None) -> List[Dict[str, Any]]:
     """
     Hilfsfunktion zum Generieren von Gegnern für ein Feld
     
@@ -303,5 +367,5 @@ def generate_enemies_for_field(field_number: int) -> List[Dict[str, Any]]:
         Liste von Gegnern
     """
     generator = EnemyGenerator()
-    return generator.generate_field_enemies(field_number)
+    return generator.generate_field_enemies(field_number, config=config)
 

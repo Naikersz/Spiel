@@ -71,9 +71,11 @@ class MainMenu:
         from scenes.load_menu import LoadMenu
         return LoadMenu()
 
-    # -----------------------------------------------------------------
+     # -----------------------------------------------------------------
     def options(self):
-        print("⚙ Optionen (noch nicht implementiert)")
+        # Statt nur printen: echte OptionsScene öffnen
+        from scenes.options_scene import OptionsScene
+        return OptionsScene()
 
     # -----------------------------------------------------------------
     def quit_game(self):

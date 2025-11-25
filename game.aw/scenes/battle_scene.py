@@ -9,7 +9,11 @@ from ui.button import Button
 from ui.fonts import FONT, FONT_SMALL
 from core.constants import WIDTH, HEIGHT
 from core.enemy_generator import generate_enemies_for_field
+from core.dev_settings import load_dev_settings
 from core.player_stats_calculator import PlayerStatsCalculator
+from core.level_data import load_level_settings, save_level_settings
+
+
 
 
 class BattleScene:
@@ -25,6 +29,20 @@ class BattleScene:
         self.slot_index = slot_index
         self.level_type = level_type
         self.level_number = level_number
+        
+        # Eindeutiger Key pro Level/Feld
+        self.level_key = f"{self.level_type}_{self.level_number}"
+
+        # Dev-Level-Settings für dieses Feld
+        self.level_config = load_level_settings(self.level_key)
+
+        # Globaler Dev-Status (aus Optionen)
+        self.dev_settings = load_dev_settings()
+        self.dev_enabled = self.dev_settings.get("dev_mode", False)
+
+        # Flag & Buttons für Dev-Overlay
+        self.show_dev_overlay = False
+        self.dev_buttons = []
         
         # Lade Hintergrundbild
         # Berechne Pfad: game.aw/scenes/ -> game.aw/ -> root/ -> assets/battle/
@@ -45,12 +63,15 @@ class BattleScene:
         # Generiere Gegner nur für "Feld" Level
         self.enemies = []
         if level_type == "Feld":
-            self.enemies = generate_enemies_for_field(level_number)
+            # Nutzt die Config für dieses Feld
+            self.enemies = generate_enemies_for_field(level_number, config=self.level_config)
             self._place_enemies_randomly()
         
         # Buttons
         self.buttons = []
-        self.create_buttons()
+        self.create_buttons()      # Zurück (+ ggf. Dev-Button)
+        if self.dev_enabled:
+            self._create_dev_buttons()  # Buttons IM Overlay
         
         # Hover und Click Tracking
         self.hovered_enemy = None  # Index des gehoverten Gegners
@@ -120,6 +141,97 @@ class BattleScene:
         self.buttons.append(
             Button("Zurück", back_x, back_y, back_w, back_h, self.back_to_level_selection)
         )
+
+        # Dev-Button (rechts oben) nur wenn Dev global aktiviert ist
+        if self.dev_enabled:
+            dev_w, dev_h = 120, 40
+            dev_x = WIDTH - dev_w - 20
+            dev_y = 20
+            self.buttons.append(
+                Button("Dev", dev_x, dev_y, dev_w, dev_h, self.toggle_dev_overlay)
+            )
+    
+    def toggle_dev_overlay(self):
+        self.show_dev_overlay = not self.show_dev_overlay
+
+    def _create_dev_buttons(self):
+        """
+        Kleine +/- Buttons im Overlay (werden nur benutzt, wenn Overlay offen ist).
+        """
+        self.dev_buttons = []
+
+        panel_width = int(WIDTH * 0.6)
+        panel_height = int(HEIGHT * 0.6)
+        panel_x = (WIDTH - panel_width) // 2
+        panel_y = (HEIGHT - panel_height) // 2
+
+        btn_w, btn_h = 40, 30
+        row_h = 40
+
+        # Startposition der Zeilen
+        base_x = panel_x + panel_width - 160
+        base_y = panel_y + 80
+
+        def add_pair(row_index, minus_cb, plus_cb):
+            y = base_y + row_index * row_h
+            self.dev_buttons.append(Button("-", base_x, y, btn_w, btn_h, minus_cb))
+            self.dev_buttons.append(Button("+", base_x + btn_w + 10, y, btn_w, btn_h, plus_cb))
+
+        add_pair(0,
+                 lambda: self._change_enemy_count(-1),
+                 lambda: self._change_enemy_count(+1))
+        add_pair(1,
+                 lambda: self._change_enchantment_min(-1),
+                 lambda: self._change_enchantment_min(+1))
+        add_pair(2,
+                 lambda: self._change_enchantment_max(-1),
+                 lambda: self._change_enchantment_max(+1))
+        add_pair(3,
+                 lambda: self._change_level_min(-1),
+                 lambda: self._change_level_min(+1))
+        add_pair(4,
+                 lambda: self._change_level_max(-1),
+                 lambda: self._change_level_max(+1))
+
+    # --- Hilfsfunktionen zum Ändern + Speichern ---
+
+    def _save_level_config(self):
+        save_level_settings(self.level_key, self.level_config)
+
+    def _change_enemy_count(self, delta):
+        v = int(self.level_config.get("enemy_count", 5)) + delta
+        v = max(1, min(50, v))
+        self.level_config["enemy_count"] = v
+        self._save_level_config()
+
+    def _change_enchantment_min(self, delta):
+        min_v = int(self.level_config.get("enchantment_min", 0)) + delta
+        max_v = int(self.level_config.get("enchantment_max", 0))
+        min_v = max(0, min(min_v, max_v))
+        self.level_config["enchantment_min"] = min_v
+        self._save_level_config()
+
+    def _change_enchantment_max(self, delta):
+        min_v = int(self.level_config.get("enchantment_min", 0))
+        max_v = int(self.level_config.get("enchantment_max", 0)) + delta
+        max_v = max(min_v, min(10, max_v))
+        self.level_config["enchantment_max"] = max_v
+        self._save_level_config()
+
+    def _change_level_min(self, delta):
+        min_v = int(self.level_config.get("monster_level_min", 1)) + delta
+        max_v = int(self.level_config.get("monster_level_max", 10))
+        min_v = max(1, min(min_v, max_v))
+        self.level_config["monster_level_min"] = min_v
+        self._save_level_config()
+
+    def _change_level_max(self, delta):
+        min_v = int(self.level_config.get("monster_level_min", 1))
+        max_v = int(self.level_config.get("monster_level_max", 10)) + delta
+        max_v = max(min_v, min(200, max_v))
+        self.level_config["monster_level_max"] = max_v
+        self._save_level_config()
+
     
     def back_to_level_selection(self):
         """Zurück zur Level-Auswahl"""
@@ -179,12 +291,18 @@ class BattleScene:
         self.hovered_enemy = hovered_index
         
         for e in events:
-            # Button-Events
+            # Buttons (Zurück + Dev)
             for btn in self.buttons:
                 result = btn.handle_event(e)
                 if result:
                     return result
-            
+
+            # Dev-Overlay aktiv? Dann nur Dev-Buttons verarbeiten, kein Kampf
+            if self.show_dev_overlay:
+                for btn in self.dev_buttons:
+                    btn.handle_event(e)
+                continue
+
             # Click auf Gegner - Starte Kampf
             if e.type == pygame.MOUSEBUTTONDOWN and e.button == 1:
                 clicked_enemy_index = self._get_enemy_at_position(e.pos)
@@ -207,6 +325,8 @@ class BattleScene:
         self._update_damage_texts(dt)
         
         return None
+
+        
     
     def _update_damage_texts(self, dt: float):
         """
@@ -334,6 +454,10 @@ class BattleScene:
         # Buttons zeichnen
         for btn in self.buttons:
             btn.draw(screen)
+        
+        # Dev-Overlay zeichnen, falls aktiv
+        if self.show_dev_overlay:
+            self._draw_dev_overlay(screen)
     
     def _draw_enemies(self, screen):
         """
@@ -358,9 +482,37 @@ class BattleScene:
             pygame.draw.rect(screen, color, enemy_rect)
             pygame.draw.rect(screen, border_color, enemy_rect, 3 if is_hovered else 2)
             
-            # Zeichne Monster-Name
+            # Zeichne Monster-Name mit Farbe je nach "Stufe"
             monster_name = enemy.get("name", "Gegner")
-            name_text = FONT_SMALL.render(monster_name, True, (255, 255, 255))
+
+            # Anzahl der Verzauberungen
+            enchantments = enemy.get("enchantments", [])
+            enchant_count = len(enchantments)
+
+            # Optional: Unique-Info aus Daten
+            loot_quality = str(enemy.get("loot_quality", "")).lower()
+            is_unique = enemy.get("is_unique", False) or loot_quality == "unique"
+
+            # Farben definieren
+            WHITE       = (255, 255, 255)
+            BLUE        = (100, 149, 237)   # 1–2 Enchants
+            PURPLE      = (186, 85, 211)    # 3–4 Enchants
+            GOLD        = (255, 215, 0)     # 5–6 Enchants
+            DARK_ORANGE = (210, 120, 0)     # Unique
+
+            # Farbe nach Regel bestimmen
+            if is_unique:
+                name_color = DARK_ORANGE
+            elif enchant_count >= 5:
+                name_color = GOLD
+            elif enchant_count >= 3:
+                name_color = PURPLE
+            elif enchant_count >= 1:
+                name_color = BLUE
+            else:
+                name_color = WHITE
+
+            name_text = FONT_SMALL.render(monster_name, True, name_color)
             screen.blit(name_text, (x - name_text.get_width() // 2, y - 40))
             
             # Zeichne HP-Balken (verwende finale Stats mit Verzauberungen)
@@ -638,3 +790,38 @@ class BattleScene:
                 text_y = int(dmg["y"])
                 screen.blit(damage_surf, (text_x, text_y))
 
+    def _draw_dev_overlay(self, screen):
+        import pygame as pg
+
+        panel_width = int(WIDTH * 0.6)
+        panel_height = int(HEIGHT * 0.6)
+        panel_x = (WIDTH - panel_width) // 2
+        panel_y = (HEIGHT - panel_height) // 2
+
+        # halbtransparentes Overlay
+        overlay = pg.Surface((panel_width, panel_height))
+        overlay.set_alpha(220)
+        overlay.fill((20, 20, 40))
+        screen.blit(overlay, (panel_x, panel_y))
+
+        pg.draw.rect(screen, (150, 180, 255), (panel_x, panel_y, panel_width, panel_height), 3)
+
+        title = FONT.render(f"Dev Level-Settings: {self.level_key}", True, (255, 255, 255))
+        screen.blit(title, (panel_x + 20, panel_y + 20))
+
+        s = self.level_config
+        lines = [
+            f"Gegneranzahl: {s.get('enemy_count', 5)}",
+            f"Verzauberungen pro Gegner: {s.get('enchantment_min', 0)} - {s.get('enchantment_max', 0)}",
+            f"Monster-Levelbereich: {s.get('monster_level_min', 1)} - {s.get('monster_level_max', 10)}",
+        ]
+
+        y = panel_y + 80
+        for line in lines:
+            txt = FONT.render(line, True, (230, 230, 230))
+            screen.blit(txt, (panel_x + 20, y))
+            y += 40
+
+        # Dev-Buttons zeichnen
+        for btn in self.dev_buttons:
+            btn.draw(screen)

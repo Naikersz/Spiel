@@ -14,34 +14,56 @@ class LevelSelectionScene:
     # Buttons erzeugen
     # --------------------------------------------------------
     def create_buttons(self):
+        self.buttons = []
+
         w, h = 200, 50
         center_x = WIDTH // 2
-        start_y = 150
+        start_y = 180
         gap = 60
 
-        # Feld Buttons (1-5)
-        self.buttons = []
+        # Feld 1–5 (linke Spalte)
         for i in range(1, 6):
-            x = center_x - w - 20
+            x = center_x - w - 40
             y = start_y + gap * (i - 1)
             self.buttons.append(
-                Button(f"Feld {i}", x, y, w, h, lambda level=i, level_type="Feld": self.start_battle(level_type, level))
+                Button(
+                    f"Feld {i}",
+                    x,
+                    y,
+                    w,
+                    h,
+                    lambda level=i: self.start_battle("Feld", level)
+                )
             )
 
-        # Cave Buttons (1-5)
+        # Cave 1–5 (rechte Spalte)
         for i in range(1, 6):
-            x = center_x + 20
+            x = center_x + 40
             y = start_y + gap * (i - 1)
             self.buttons.append(
-                Button(f"Cave {i}", x, y, w, h, lambda level=i, level_type="Cave": self.start_battle(level_type, level))
+                Button(
+                    f"Cave {i}",
+                    x,
+                    y,
+                    w,
+                    h,
+                    lambda level=i: self.start_battle("Cave", level)
+                )
             )
 
-        # Zurück Button
+        # Zurück-Button unten
         back_w, back_h = 180, 50
-        back_x = center_x - back_w // 2
+        back_x = WIDTH // 2 - back_w // 2
         back_y = start_y + gap * 5 + 20
         self.buttons.append(
-            Button("Zurück", back_x, back_y, back_w, back_h, self.back_to_town)
+            Button(
+                "Zurück",
+                back_x,
+                back_y,
+                back_w,
+                back_h,
+                self.back_to_town
+            )
         )
 
     # --------------------------------------------------------
@@ -49,13 +71,8 @@ class LevelSelectionScene:
     # --------------------------------------------------------
     def start_battle(self, level_type, level_number):
         print(f"⚔️ {level_type} {level_number} gestartet!")
-        # Starte Battle Scene nur für Feld 1 und weiter
-        if level_type == "Feld":
-            from scenes.battle_scene import BattleScene
-            return BattleScene(self.slot_index, level_type, level_number)
-        else:
-            # Cave noch nicht implementiert
-            print(f"Cave {level_number} noch nicht implementiert")
+        from scenes.battle_scene import BattleScene
+        return BattleScene(self.slot_index, level_type, level_number)
 
     def back_to_town(self):
         print("⬅ Zurück zur Stadt")
@@ -85,13 +102,18 @@ class LevelSelectionScene:
         # Kategorien-Labels
         feld_label = FONT.render("Feld", True, (200, 255, 200))
         cave_label = FONT.render("Cave", True, (200, 200, 255))
-        
+
         center_x = WIDTH // 2
         label_y = 120
-        screen.blit(feld_label, (center_x - 200 - feld_label.get_width() // 2, label_y))
-        screen.blit(cave_label, (center_x + 200 - cave_label.get_width() // 2, label_y))
+        screen.blit(
+            feld_label,
+            (center_x - 200 - feld_label.get_width() // 2, label_y)
+        )
+        screen.blit(
+            cave_label,
+            (center_x + 200 - cave_label.get_width() // 2, label_y)
+        )
 
         # Buttons zeichnen
         for btn in self.buttons:
             btn.draw(screen)
-

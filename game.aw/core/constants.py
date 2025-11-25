@@ -15,4 +15,4 @@ ASSET_ICON_PATH = os.path.join(BASE_PATH, "assets", "icons")
 # ---------------------------------------------------
 # WINDOW
 # ---------------------------------------------------
-WIDTH, HEIGHT = 900, 600
+WIDTH, HEIGHT = 1600, 900
