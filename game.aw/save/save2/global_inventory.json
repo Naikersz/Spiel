@@ -1,0 +1,250 @@
+[
+    {
+        "id": "leather_gloves",
+        "name": "Leather Gloves",
+        "item_type": "glove",
+        "item_level": 1,
+        "min_player_level": 1,
+        "material": {
+            "type": "leather",
+            "disassembly_yield": 2
+        },
+        "enchant_slots": 6,
+        "requirements": {
+            "strength": 1,
+            "dexterity": 7,
+            "intelligence": 0
+        },
+        "stats": {
+            "armour": 5,
+            "evasion": 8,
+            "energy_shield": 0,
+            "block_chance": 1,
+            "attack_speed": 0.0,
+            "movement_speed": 0,
+            "damage": 0
+        },
+        "enchantments": [
+            {
+                "id": "attack_speed",
+                "name": "Angriffsgeschwindigkeit +",
+                "type": "attack_speed",
+                "value": 1,
+                "rolled_tier": 1
+            }
+        ]
+    },
+    {
+        "id": "silk_robe",
+        "name": "Silk Robe",
+        "item_type": "chest",
+        "item_level": 1,
+        "min_player_level": 1,
+        "material": {
+            "type": "cloth",
+            "disassembly_yield": 2
+        },
+        "enchant_slots": 6,
+        "requirements": {
+            "strength": 0,
+            "dexterity": 1,
+            "intelligence": 8
+        },
+        "stats": {
+            "armour": 0,
+            "evasion": 8,
+            "energy_shield": 6,
+            "block_chance": 0,
+            "attack_speed": 0,
+            "movement_speed": 0,
+            "damage": 0
+        },
+        "enchantments": []
+    },
+    {
+        "id": "dagger",
+        "name": "Dagger",
+        "item_type": "weapon",
+        "item_level": 1,
+        "min_player_level": 1,
+        "material": {
+            "type": "iron",
+            "disassembly_yield": 10
+        },
+        "enchant_slots": 6,
+        "requirements": {
+            "strength": 1,
+            "dexterity": 10,
+            "intelligence": 0
+        },
+        "stats": {
+            "armour": 0,
+            "evasion": 0,
+            "energy_shield": 0,
+            "block_chance": 0,
+            "attack_speed": 1.4535774420266017,
+            "movement_speed": 0,
+            "damage": 10
+        },
+        "enchantments": []
+    },
+    {
+        "id": "leather_gloves",
+        "name": "Leather Gloves",
+        "item_type": "glove",
+        "item_level": 1,
+        "min_player_level": 1,
+        "material": {
+            "type": "leather",
+            "disassembly_yield": 2
+        },
+        "enchant_slots": 6,
+        "requirements": {
+            "strength": 2,
+            "dexterity": 10,
+            "intelligence": 0
+        },
+        "stats": {
+            "armour": 5,
+            "evasion": 8,
+            "energy_shield": 0,
+            "block_chance": 1,
+            "attack_speed": 0.0,
+            "movement_speed": 0,
+            "damage": 0
+        },
+        "enchantments": []
+    },
+    {
+        "id": "cloth_pants",
+        "name": "Cloth Pants",
+        "item_type": "pants",
+        "item_level": 1,
+        "min_player_level": 1,
+        "material": {
+            "type": "cloth",
+            "disassembly_yield": 2
+        },
+        "enchant_slots": 6,
+        "requirements": {
+            "strength": 0,
+            "dexterity": 1,
+            "intelligence": 6
+        },
+        "stats": {
+            "armour": 0,
+            "evasion": 8,
+            "energy_shield": 7,
+            "block_chance": 0,
+            "attack_speed": 0,
+            "movement_speed": 0,
+            "damage": 0
+        },
+        "enchantments": [
+            {
+                "id": "intelligence",
+                "name": "Intelligenz +",
+                "type": "intelligence",
+                "value": 1,
+                "rolled_tier": 1
+            }
+        ]
+    },
+    {
+        "id": "steel_gauntlets",
+        "name": "Steel Gauntlets",
+        "item_type": "glove",
+        "item_level": 20,
+        "min_player_level": 14,
+        "material": {
+            "type": "steel",
+            "disassembly_yield": 6
+        },
+        "enchant_slots": 6,
+        "requirements": {
+            "strength": 36,
+            "dexterity": 7,
+            "intelligence": 1
+        },
+        "stats": {
+            "armour": 80,
+            "evasion": 2,
+            "energy_shield": 0,
+            "block_chance": 3,
+            "attack_speed": 0.10547592640808479,
+            "movement_speed": 0,
+            "damage": 0
+        },
+        "enchantments": [
+            {
+                "id": "crit_multi",
+                "name": "Kritischer Trefferschaden %",
+                "type": "crit_multi",
+                "value": 3,
+                "rolled_tier": 1
+            }
+        ]
+    },
+    {
+        "id": "steel_gauntlets",
+        "name": "Steel Gauntlets",
+        "item_type": "glove",
+        "item_level": 20,
+        "min_player_level": 14,
+        "material": {
+            "type": "steel",
+            "disassembly_yield": 6
+        },
+        "enchant_slots": 6,
+        "requirements": {
+            "strength": 33,
+            "dexterity": 9,
+            "intelligence": 1
+        },
+        "stats": {
+            "armour": 78,
+            "evasion": 6,
+            "energy_shield": 3,
+            "block_chance": 4,
+            "attack_speed": 0.1957815790341626,
+            "movement_speed": 0,
+            "damage": 0
+        },
+        "enchantments": []
+    },
+    {
+        "id": "plate_pants",
+        "name": "Plate Pants",
+        "item_type": "pants",
+        "item_level": 40,
+        "min_player_level": 28,
+        "material": {
+            "type": "steel",
+            "disassembly_yield": 12
+        },
+        "enchant_slots": 6,
+        "requirements": {
+            "strength": 77,
+            "dexterity": 3,
+            "intelligence": 0
+        },
+        "stats": {
+            "armour": 459,
+            "evasion": 0,
+            "energy_shield": 4,
+            "block_chance": 4,
+            "attack_speed": 0,
+            "movement_speed": 0,
+            "damage": 0
+        },
+        "enchantments": [
+            {
+                "id": "item_drop_chance",
+                "name": "Itemfundchance +",
+                "type": "item_drop_chance",
+                "value": 2,
+                "rolled_tier": 2
+            }
+        ]
+    }
+]

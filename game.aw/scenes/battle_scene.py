@@ -1,10 +1,12 @@
 """
 Battle Scene - Kampfszene mit Gegnern
 """
-import pygame
-import random
+import json
 import os
-from typing import Dict
+import random
+from typing import Any, Dict
+
+import pygame
 from ui.button import Button
 from ui.fonts import FONT, FONT_SMALL
 from core.constants import WIDTH, HEIGHT
@@ -12,6 +14,8 @@ from core.enemy_generator import generate_enemies_for_field
 from core.dev_settings import load_dev_settings
 from core.player_stats_calculator import PlayerStatsCalculator
 from core.level_data import load_level_settings, save_level_settings
+from core.loot_generator import LootGenerator
+from core.constants import SAVE_ROOT, SAVE_SLOTS
 
 
 
@@ -67,6 +71,9 @@ class BattleScene:
             self.enemies = generate_enemies_for_field(level_number, config=self.level_config)
             self._place_enemies_randomly()
         
+        # Loot-Generator
+        self.loot_generator = LootGenerator()
+
         # Buttons
         self.buttons = []
         self.create_buttons()      # Zurück (+ ggf. Dev-Button)
@@ -415,9 +422,45 @@ class BattleScene:
         # Prüfe ob Gegner tot ist
         if new_hp <= 0:
             print(f"   ✝️ Gegner '{enemy.get('name', 'Unbekannt')}' ist gestorben!")
+            self._handle_enemy_death(enemy)
             return True
         
         return False
+
+    def _handle_enemy_death(self, enemy: Dict[str, Any]):
+        """
+        Versucht einen Itemdrop zu generieren und speichert ihn im Inventar.
+        """
+        monster_level = enemy.get("level", 1)
+        loot_item = self.loot_generator.generate_loot(monster_level)
+
+        if not loot_item:
+            return
+
+        self._add_item_to_inventory(loot_item)
+        item_name = loot_item.get("name", loot_item.get("id", "Item"))
+        print(f"💰 Loot erhalten: {item_name}")
+
+    def _add_item_to_inventory(self, item: Dict[str, Any]):
+        """
+        Speichert ein Item im globalen Inventar des aktuellen Slots.
+        """
+        save_dir = os.path.join(SAVE_ROOT, SAVE_SLOTS[self.slot_index])
+        os.makedirs(save_dir, exist_ok=True)
+        inventory_path = os.path.join(save_dir, "global_inventory.json")
+
+        try:
+            with open(inventory_path, "r", encoding="utf-8") as f:
+                inventory = json.load(f)
+        except FileNotFoundError:
+            inventory = []
+        except json.JSONDecodeError:
+            inventory = []
+
+        inventory.append(item)
+
+        with open(inventory_path, "w", encoding="utf-8") as f:
+            json.dump(inventory, f, ensure_ascii=False, indent=4)
     
     def draw(self, screen):
         """

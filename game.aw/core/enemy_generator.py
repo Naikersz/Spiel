@@ -76,7 +76,13 @@ class EnemyGenerator:
                 available.append(enchant)
         return available
     
-    def _select_random_enchantments(self, available_enchantments: List[Dict], count: int, max_slots: int = 6) -> List[Dict[str, Any]]:
+    def _select_random_enchantments(
+        self,
+        available_enchantments: List[Dict],
+        count: int,
+        max_slots: int = 6,
+        monster_level: int = 1,
+    ) -> List[Dict[str, Any]]:
         """
         Wählt zufällige Verzauberungen aus
         
@@ -96,6 +102,7 @@ class EnemyGenerator:
         
         selected = random.sample(available_enchantments, count)
         result = []
+        max_tier = self._get_max_tier_for_level(monster_level)
         
         for enchant in selected:
             # Generiere einen zufälligen Wert basierend auf value_min und value_max
@@ -103,12 +110,29 @@ class EnemyGenerator:
             value_max = enchant.get("value_max", 0)
             value = random.randint(value_min, value_max) if value_max > value_min else value_min
             
+            # Rolle das Tier basierend auf dem Monsterlevel (mind. 1)
+            rolled_tier = random.randint(1, max_tier)
+
+            # Skaliere den Wert mit dem Tier
+            scaled_value = value * rolled_tier
+
             # Erstelle eine Kopie der Verzauberung mit generiertem Wert
             enchant_copy = enchant.copy()
-            enchant_copy["value"] = value
+            enchant_copy["value"] = scaled_value
+            enchant_copy["rolled_tier"] = rolled_tier
             result.append(enchant_copy)
         
         return result
+    
+    def _get_max_tier_for_level(self, monster_level: int) -> int:
+        """
+        Bestimmt das maximale Tier für ein gegebenes Monsterlevel.
+
+        Alle 20 Level steigt das mögliche Tier um 1 (Level 1-20 = Tier 1, 21-40 = Tier 2, etc.)
+        """
+        if monster_level <= 0:
+            return 1
+        return 1 + ((monster_level - 1) // 20)
     
     def _randomize_stats(self, monster_data: Dict[str, Any]) -> Dict[str, Any]:
         """
@@ -195,7 +219,12 @@ class EnemyGenerator:
         if enchantment_count > 0:
             available = self._get_available_enchantments(monster.get("level", 1))
             max_slots = monster.get("enchant_slots", 6)
-            enchantments = self._select_random_enchantments(available, enchantment_count, max_slots)
+            enchantments = self._select_random_enchantments(
+                available,
+                enchantment_count,
+                max_slots,
+                monster.get("level", 1),
+            )
         
         enemy["enchantments"] = enchantments
         

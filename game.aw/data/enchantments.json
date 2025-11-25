@@ -1,765 +1,139 @@
 [
   {
-    "id": "strength_t1",
+    "id": "strength",
     "name": "Stärke +",
     "type": "strength",
-    "tier": 1,
     "value_min": 1,
     "value_max": 3,
     "item_level_min": 1,
     "item_level_max": 100
   },
   {
-    "id": "strength_t2",
-    "name": "Stärke +",
-    "type": "strength",
-    "tier": 2,
-    "value_min": 4,
-    "value_max": 8,
-    "item_level_min": 20,
-    "item_level_max": 100
-  },
-  {
-    "id": "strength_t3",
-    "name": "Stärke +",
-    "type": "strength",
-    "tier": 3,
-    "value_min": 9,
-    "value_max": 15,
-    "item_level_min": 40,
-    "item_level_max": 100
-  },
-  {
-    "id": "strength_t4",
-    "name": "Stärke +",
-    "type": "strength",
-    "tier": 4,
-    "value_min": 16,
-    "value_max": 25,
-    "item_level_min": 60,
-    "item_level_max": 100
-  },
-  {
-    "id": "strength_t5",
-    "name": "Stärke +",
-    "type": "strength",
-    "tier": 5,
-    "value_min": 26,
-    "value_max": 40,
-    "item_level_min": 80,
-    "item_level_max": 100
-  },
-
-  {
-    "id": "dexterity_t1",
+    "id": "dexterity",
     "name": "Geschicklichkeit +",
     "type": "dexterity",
-    "tier": 1,
     "value_min": 1,
     "value_max": 3,
     "item_level_min": 1,
     "item_level_max": 100
   },
   {
-    "id": "dexterity_t2",
-    "name": "Geschicklichkeit +",
-    "type": "dexterity",
-    "tier": 2,
-    "value_min": 4,
-    "value_max": 8,
-    "item_level_min": 20,
-    "item_level_max": 100
-  },
-  {
-    "id": "dexterity_t3",
-    "name": "Geschicklichkeit +",
-    "type": "dexterity",
-    "tier": 3,
-    "value_min": 9,
-    "value_max": 15,
-    "item_level_min": 40,
-    "item_level_max": 100
-  },
-  {
-    "id": "dexterity_t4",
-    "name": "Geschicklichkeit +",
-    "type": "dexterity",
-    "tier": 4,
-    "value_min": 16,
-    "value_max": 25,
-    "item_level_min": 60,
-    "item_level_max": 100
-  },
-  {
-    "id": "dexterity_t5",
-    "name": "Geschicklichkeit +",
-    "type": "dexterity",
-    "tier": 5,
-    "value_min": 26,
-    "value_max": 40,
-    "item_level_min": 80,
-    "item_level_max": 100
-  },
-
-  {
-    "id": "intelligence_t1",
+    "id": "intelligence",
     "name": "Intelligenz +",
     "type": "intelligence",
-    "tier": 1,
+    
     "value_min": 1,
     "value_max": 3,
     "item_level_min": 1,
     "item_level_max": 100
   },
   {
-    "id": "intelligence_t2",
-    "name": "Intelligenz +",
-    "type": "intelligence",
-    "tier": 2,
-    "value_min": 4,
-    "value_max": 8,
-    "item_level_min": 20,
-    "item_level_max": 100
-  },
-  {
-    "id": "intelligence_t3",
-    "name": "Intelligenz +",
-    "type": "intelligence",
-    "tier": 3,
-    "value_min": 9,
-    "value_max": 15,
-    "item_level_min": 40,
-    "item_level_max": 100
-  },
-  {
-    "id": "intelligence_t4",
-    "name": "Intelligenz +",
-    "type": "intelligence",
-    "tier": 4,
-    "value_min": 16,
-    "value_max": 25,
-    "item_level_min": 60,
-    "item_level_max": 100
-  },
-  {
-    "id": "intelligence_t5",
-    "name": "Intelligenz +",
-    "type": "intelligence",
-    "tier": 5,
-    "value_min": 26,
-    "value_max": 40,
-    "item_level_min": 80,
-    "item_level_max": 100
-  },
-
-  {
-    "id": "defence_t1",
+    "id": "defence",
     "name": "Verteidigung +",
     "type": "defence",
-    "tier": 1,
     "value_min": 1,
     "value_max": 3,
     "item_level_min": 1,
     "item_level_max": 100
   },
   {
-    "id": "defence_t2",
-    "name": "Verteidigung +",
-    "type": "defence",
-    "tier": 2,
-    "value_min": 4,
-    "value_max": 8,
-    "item_level_min": 20,
-    "item_level_max": 100
-  },
-  {
-    "id": "defence_t3",
-    "name": "Verteidigung +",
-    "type": "defence",
-    "tier": 3,
-    "value_min": 9,
-    "value_max": 15,
-    "item_level_min": 40,
-    "item_level_max": 100
-  },
-  {
-    "id": "defence_t4",
-    "name": "Verteidigung +",
-    "type": "defence",
-    "tier": 4,
-    "value_min": 16,
-    "value_max": 25,
-    "item_level_min": 60,
-    "item_level_max": 100
-  },
-  {
-    "id": "defence_t5",
-    "name": "Verteidigung +",
-    "type": "defence",
-    "tier": 5,
-    "value_min": 26,
-    "value_max": 40,
-    "item_level_min": 80,
-    "item_level_max": 100
-  },
-
-  {
-    "id": "hp_t1",
+    "id": "hp",
     "name": "Leben +",
     "type": "hp",
-    "tier": 1,
     "value_min": 5,
     "value_max": 15,
     "item_level_min": 1,
     "item_level_max": 100
   },
   {
-    "id": "hp_t2",
-    "name": "Leben +",
-    "type": "hp",
-    "tier": 2,
-    "value_min": 16,
-    "value_max": 30,
-    "item_level_min": 20,
-    "item_level_max": 100
-  },
-  {
-    "id": "hp_t3",
-    "name": "Leben +",
-    "type": "hp",
-    "tier": 3,
-    "value_min": 31,
-    "value_max": 50,
-    "item_level_min": 40,
-    "item_level_max": 100
-  },
-  {
-    "id": "hp_t4",
-    "name": "Leben +",
-    "type": "hp",
-    "tier": 4,
-    "value_min": 51,
-    "value_max": 75,
-    "item_level_min": 60,
-    "item_level_max": 100
-  },
-  {
-    "id": "hp_t5",
-    "name": "Leben +",
-    "type": "hp",
-    "tier": 5,
-    "value_min": 76,
-    "value_max": 100,
-    "item_level_min": 80,
-    "item_level_max": 100
-  },
-
-  {
-    "id": "attack_speed_t1",
+    "id": "attack_speed",
     "name": "Angriffsgeschwindigkeit +",
     "type": "attack_speed",
-    "tier": 1,
     "value_min": 1,
     "value_max": 2,
     "item_level_min": 1,
     "item_level_max": 100
   },
   {
-    "id": "attack_speed_t2",
-    "name": "Angriffsgeschwindigkeit +",
-    "type": "attack_speed",
-    "tier": 2,
-    "value_min": 3,
-    "value_max": 4,
-    "item_level_min": 20,
-    "item_level_max": 100
-  },
-  {
-    "id": "attack_speed_t3",
-    "name": "Angriffsgeschwindigkeit +",
-    "type": "attack_speed",
-    "tier": 3,
-    "value_min": 5,
-    "value_max": 6,
-    "item_level_min": 40,
-    "item_level_max": 100
-  },
-  {
-    "id": "attack_speed_t4",
-    "name": "Angriffsgeschwindigkeit +",
-    "type": "attack_speed",
-    "tier": 4,
-    "value_min": 7,
-    "value_max": 8,
-    "item_level_min": 60,
-    "item_level_max": 100
-  },
-  {
-    "id": "attack_speed_t5",
-    "name": "Angriffsgeschwindigkeit +",
-    "type": "attack_speed",
-    "tier": 5,
-    "value_min": 9,
-    "value_max": 10,
-    "item_level_min": 80,
-    "item_level_max": 100
-  },
-  {
-    "id": "item_drop_chance_t1",
+    "id": "item_drop_chance",
     "name": "Itemfundchance +",
     "type": "item_drop_chance",
-    "tier": 1,
     "value_min": 1,
     "value_max": 2,
     "item_level_min": 1,
     "item_level_max": 100
   },
   {
-    "id": "item_drop_chance_t2",
-    "name": "Itemfundchance +",
-    "type": "item_drop_chance",
-    "tier": 2,
-    "value_min": 3,
-    "value_max": 4,
-    "item_level_min": 20,
-    "item_level_max": 100
-  },
-  {
-    "id": "item_drop_chance_t3",
-    "name": "Itemfundchance +",
-    "type": "item_drop_chance",
-    "tier": 3,
-    "value_min": 5,
-    "value_max": 6,
-    "item_level_min": 40,
-    "item_level_max": 100
-  },
-  {
-    "id": "item_drop_chance_t4",
-    "name": "Itemfundchance +",
-    "type": "item_drop_chance",
-    "tier": 4,
-    "value_min": 7,
-    "value_max": 8,
-    "item_level_min": 60,
-    "item_level_max": 100
-  },
-  {
-    "id": "item_drop_chance_t5",
-    "name": "Itemfundchance +",
-    "type": "item_drop_chance",
-    "tier": 5,
-    "value_min": 9,
-    "value_max": 10,
-    "item_level_min": 80,
-    "item_level_max": 100
-  },
-
-  {
-    "id": "enchantment_roll_chance_t1",
+    "id": "enchantment_roll_chance",
     "name": "Verzauberungsfundchance +",
     "type": "enchantment_roll_chance",
-    "tier": 1,
     "value_min": 1,
     "value_max": 2,
     "item_level_min": 1,
     "item_level_max": 100
   },
   {
-    "id": "enchantment_roll_chance_t2",
-    "name": "Verzauberungsfundchance +",
-    "type": "enchantment_roll_chance",
-    "tier": 2,
-    "value_min": 3,
-    "value_max": 4,
-    "item_level_min": 20,
-    "item_level_max": 100
-  },
-  {
-    "id": "enchantment_roll_chance_t3",
-    "name": "Verzauberungsfundchance +",
-    "type": "enchantment_roll_chance",
-    "tier": 3,
-    "value_min": 5,
-    "value_max": 6,
-    "item_level_min": 40,
-    "item_level_max": 100
-  },
-  {
-    "id": "enchantment_roll_chance_t4",
-    "name": "Verzauberungsfundchance +",
-    "type": "enchantment_roll_chance",
-    "tier": 4,
-    "value_min": 7,
-    "value_max": 8,
-    "item_level_min": 60,
-    "item_level_max": 100
-  },
-  {
-    "id": "enchantment_roll_chance_t5",
-    "name": "Verzauberungsfundchance +",
-    "type": "enchantment_roll_chance",
-    "tier": 5,
-    "value_min": 9,
-    "value_max": 10,
-    "item_level_min": 80,
-    "item_level_max": 100
-  },
-  {
-    "id": "magic_defence_t1",
+    "id": "magic_defence",
     "name": "Magische Verteidigung +",
     "type": "magic_defence",
-    "tier": 1,
+    
     "value_min": 1,
     "value_max": 3,
     "item_level_min": 1,
     "item_level_max": 100
   },
   {
-    "id": "magic_defence_t2",
-    "name": "Magische Verteidigung +",
-    "type": "magic_defence",
-    "tier": 2,
-    "value_min": 4,
-    "value_max": 7,
-    "item_level_min": 20,
-    "item_level_max": 100
-  },
-  {
-    "id": "magic_defence_t3",
-    "name": "Magische Verteidigung +",
-    "type": "magic_defence",
-    "tier": 3,
-    "value_min": 8,
-    "value_max": 12,
-    "item_level_min": 40,
-    "item_level_max": 100
-  },
-  {
-    "id": "magic_defence_t4",
-    "name": "Magische Verteidigung +",
-    "type": "magic_defence",
-    "tier": 4,
-    "value_min": 13,
-    "value_max": 18,
-    "item_level_min": 60,
-    "item_level_max": 100
-  },
-  {
-    "id": "magic_defence_t5",
-    "name": "Magische Verteidigung +",
-    "type": "magic_defence",
-    "tier": 5,
-    "value_min": 19,
-    "value_max": 25,
-    "item_level_min": 80,
-    "item_level_max": 100
-  },
-
-  {
-    "id": "movement_speed_t1",
+    "id": "movement_speed",
     "name": "Bewegungsgeschwindigkeit %",
     "type": "movement_speed",
-    "tier": 1,
     "value_min": 1,
     "value_max": 3,
     "item_level_min": 1,
     "item_level_max": 100
   },
   {
-    "id": "movement_speed_t2",
-    "name": "Bewegungsgeschwindigkeit %",
-    "type": "movement_speed",
-    "tier": 2,
-    "value_min": 4,
-    "value_max": 6,
-    "item_level_min": 20,
-    "item_level_max": 100
-  },
-  {
-    "id": "movement_speed_t3",
-    "name": "Bewegungsgeschwindigkeit %",
-    "type": "movement_speed",
-    "tier": 3,
-    "value_min": 7,
-    "value_max": 10,
-    "item_level_min": 40,
-    "item_level_max": 100
-  },
-  {
-    "id": "movement_speed_t4",
-    "name": "Bewegungsgeschwindigkeit %",
-    "type": "movement_speed",
-    "tier": 4,
-    "value_min": 11,
-    "value_max": 14,
-    "item_level_min": 60,
-    "item_level_max": 100
-  },
-  {
-    "id": "movement_speed_t5",
-    "name": "Bewegungsgeschwindigkeit %",
-    "type": "movement_speed",
-    "tier": 5,
-    "value_min": 15,
-    "value_max": 20,
-    "item_level_min": 80,
-    "item_level_max": 100
-  },
-
-  {
-    "id": "block_chance_t1",
+    "id": "block_chance",
     "name": "Blockchance %",
     "type": "block_chance",
-    "tier": 1,
     "value_min": 1,
     "value_max": 2,
     "item_level_min": 1,
     "item_level_max": 100
   },
   {
-    "id": "block_chance_t2",
-    "name": "Blockchance %",
-    "type": "block_chance",
-    "tier": 2,
-    "value_min": 3,
-    "value_max": 4,
-    "item_level_min": 20,
-    "item_level_max": 100
-  },
-  {
-    "id": "block_chance_t3",
-    "name": "Blockchance %",
-    "type": "block_chance",
-    "tier": 3,
-    "value_min": 5,
-    "value_max": 6,
-    "item_level_min": 40,
-    "item_level_max": 100
-  },
-  {
-    "id": "block_chance_t4",
-    "name": "Blockchance %",
-    "type": "block_chance",
-    "tier": 4,
-    "value_min": 7,
-    "value_max": 9,
-    "item_level_min": 60,
-    "item_level_max": 100
-  },
-  {
-    "id": "block_chance_t5",
-    "name": "Blockchance %",
-    "type": "block_chance",
-    "tier": 5,
-    "value_min": 10,
-    "value_max": 12,
-    "item_level_min": 80,
-    "item_level_max": 100
-  },
-
-  {
-    "id": "attack_power_t1",
+    "id": "attack_power",
     "name": "Angriffskraft +",
     "type": "attack_power",
-    "tier": 1,
     "value_min": 2,
     "value_max": 5,
     "item_level_min": 1,
     "item_level_max": 100
   },
   {
-    "id": "attack_power_t2",
-    "name": "Angriffskraft +",
-    "type": "attack_power",
-    "tier": 2,
-    "value_min": 6,
-    "value_max": 10,
-    "item_level_min": 20,
-    "item_level_max": 100
-  },
-  {
-    "id": "attack_power_t3",
-    "name": "Angriffskraft +",
-    "type": "attack_power",
-    "tier": 3,
-    "value_min": 11,
-    "value_max": 18,
-    "item_level_min": 40,
-    "item_level_max": 100
-  },
-  {
-    "id": "attack_power_t4",
-    "name": "Angriffskraft +",
-    "type": "attack_power",
-    "tier": 4,
-    "value_min": 19,
-    "value_max": 27,
-    "item_level_min": 60,
-    "item_level_max": 100
-  },
-  {
-    "id": "attack_power_t5",
-    "name": "Angriffskraft +",
-    "type": "attack_power",
-    "tier": 5,
-    "value_min": 28,
-    "value_max": 40,
-    "item_level_min": 80,
-    "item_level_max": 100
-  },
-
-  {
-    "id": "magic_power_t1",
+    "id": "magic_power",
     "name": "Magiekraft +",
     "type": "magic_power",
-    "tier": 1,
     "value_min": 2,
     "value_max": 5,
     "item_level_min": 1,
     "item_level_max": 100
   },
   {
-    "id": "magic_power_t2",
-    "name": "Magiekraft +",
-    "type": "magic_power",
-    "tier": 2,
-    "value_min": 6,
-    "value_max": 10,
-    "item_level_min": 20,
-    "item_level_max": 100
-  },
-  {
-    "id": "magic_power_t3",
-    "name": "Magiekraft +",
-    "type": "magic_power",
-    "tier": 3,
-    "value_min": 11,
-    "value_max": 18,
-    "item_level_min": 40,
-    "item_level_max": 100
-  },
-  {
-    "id": "magic_power_t4",
-    "name": "Magiekraft +",
-    "type": "magic_power",
-    "tier": 4,
-    "value_min": 19,
-    "value_max": 27,
-    "item_level_min": 60,
-    "item_level_max": 100
-  },
-  {
-    "id": "magic_power_t5",
-    "name": "Magiekraft +",
-    "type": "magic_power",
-    "tier": 5,
-    "value_min": 28,
-    "value_max": 40,
-    "item_level_min": 80,
-    "item_level_max": 100
-  },
-
-  {
-    "id": "crit_chance_t1",
+    "id": "crit_chance",
     "name": "Kritische Trefferchance %",
     "type": "crit_chance",
-    "tier": 1,
     "value_min": 1,
     "value_max": 2,
     "item_level_min": 1,
     "item_level_max": 100
   },
   {
-    "id": "crit_chance_t2",
-    "name": "Kritische Trefferchance %",
-    "type": "crit_chance",
-    "tier": 2,
-    "value_min": 3,
-    "value_max": 4,
-    "item_level_min": 20,
-    "item_level_max": 100
-  },
-  {
-    "id": "crit_chance_t3",
-    "name": "Kritische Trefferchance %",
-    "type": "crit_chance",
-    "tier": 3,
-    "value_min": 5,
-    "value_max": 6,
-    "item_level_min": 40,
-    "item_level_max": 100
-  },
-  {
-    "id": "crit_chance_t4",
-    "name": "Kritische Trefferchance %",
-    "type": "crit_chance",
-    "tier": 4,
-    "value_min": 7,
-    "value_max": 8,
-    "item_level_min": 60,
-    "item_level_max": 100
-  },
-  {
-    "id": "crit_chance_t5",
-    "name": "Kritische Trefferchance %",
-    "type": "crit_chance",
-    "tier": 5,
-    "value_min": 9,
-    "value_max": 12,
-    "item_level_min": 80,
-    "item_level_max": 100
-  },
-
-  {
-    "id": "crit_multi_t1",
+    "id": "crit_multi",
     "name": "Kritischer Trefferschaden %",
     "type": "crit_multi",
-    "tier": 1,
     "value_min": 3,
     "value_max": 6,
     "item_level_min": 1,
-    "item_level_max": 100
-  },
-  {
-    "id": "crit_multi_t2",
-    "name": "Kritischer Trefferschaden %",
-    "type": "crit_multi",
-    "tier": 2,
-    "value_min": 7,
-    "value_max": 12,
-    "item_level_min": 20,
-    "item_level_max": 100
-  },
-  {
-    "id": "crit_multi_t3",
-    "name": "Kritischer Trefferschaden %",
-    "type": "crit_multi",
-    "tier": 3,
-    "value_min": 13,
-    "value_max": 18,
-    "item_level_min": 40,
-    "item_level_max": 100
-  },
-  {
-    "id": "crit_multi_t4",
-    "name": "Kritischer Trefferschaden %",
-    "type": "crit_multi",
-    "tier": 4,
-    "value_min": 19,
-    "value_max": 26,
-    "item_level_min": 60,
-    "item_level_max": 100
-  },
-  {
-    "id": "crit_multi_t5",
-    "name": "Kritischer Trefferschaden %",
-    "type": "crit_multi",
-    "tier": 5,
-    "value_min": 27,
-    "value_max": 35,
-    "item_level_min": 80,
     "item_level_max": 100
   }
 ]
-

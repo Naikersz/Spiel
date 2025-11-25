@@ -15,34 +15,123 @@
         "experience": 0
     },
     "equipped": {
-        "weapon": null,
-        "helmet": null,
-        "chest": {
-            "id": "magic_staff",
-            "name": "Magic Staff",
+        "weapon": {
+            "id": "steel_sword",
+            "name": "Steel Sword",
             "item_type": "weapon",
-            "item_level": 12,
-            "min_player_level": 9,
-            "requirements": {
-            "strength": 0,
-            "dexterity": 0,
-            "intelligence": 30
-            },
-            "base_stats": {
-            "armour": 0,
-            "evasion": 0,
-            "energy_shield": 18,
-            "block_chance": 0,
-            "attack_speed": 1,
-            "movement_speed": 0,
-            "damage": 12
-            },
+            "item_level": 20,
+            "min_player_level": 14,
             "material": {
-            "type": "arcane_crystal",
-            "disassembly_yield": 12
+                "type": "steel",
+                "disassembly_yield": 14
             },
             "enchant_slots": 6,
-            "possible_enchantments": []
+            "requirements": {
+                "strength": 46,
+                "dexterity": 9,
+                "intelligence": 0
+            },
+            "stats": {
+                "armour": 0,
+                "evasion": 3,
+                "energy_shield": 2,
+                "block_chance": 0,
+                "attack_speed": 1.1297529925228995,
+                "movement_speed": 0,
+                "damage": 75
+            },
+            "enchantments": []
+        },
+        "helmet": {
+            "id": "chain_hood",
+            "name": "Chain Hood",
+            "item_type": "helmet",
+            "item_level": 12,
+            "min_player_level": 9,
+            "material": {
+                "type": "chain",
+                "disassembly_yield": 6
+            },
+            "enchant_slots": 6,
+            "requirements": {
+                "strength": 18,
+                "dexterity": 14,
+                "intelligence": 0
+            },
+            "stats": {
+                "armour": 65,
+                "evasion": 17,
+                "energy_shield": 1,
+                "block_chance": 0,
+                "attack_speed": 0,
+                "movement_speed": 0,
+                "damage": 0
+            },
+            "enchantments": [
+                {
+                    "id": "crit_chance",
+                    "name": "Kritische Trefferchance %",
+                    "type": "crit_chance",
+                    "value": 2,
+                    "rolled_tier": 1
+                },
+                {
+                    "id": "enchantment_roll_chance",
+                    "name": "Verzauberungsfundchance +",
+                    "type": "enchantment_roll_chance",
+                    "value": 2,
+                    "rolled_tier": 1
+                }
+            ]
+        },
+        "chest": {
+            "id": "chainmail_tunic",
+            "name": "Chainmail Tunic",
+            "item_type": "chest",
+            "item_level": 12,
+            "min_player_level": 8,
+            "material": {
+                "type": "chain",
+                "disassembly_yield": 6
+            },
+            "enchant_slots": 6,
+            "requirements": {
+                "strength": 16,
+                "dexterity": 11,
+                "intelligence": 0
+            },
+            "stats": {
+                "armour": 68,
+                "evasion": 6,
+                "energy_shield": 2,
+                "block_chance": 0,
+                "attack_speed": 0,
+                "movement_speed": 0,
+                "damage": 0
+            },
+            "enchantments": [
+                {
+                    "id": "defence",
+                    "name": "Verteidigung +",
+                    "type": "defence",
+                    "value": 1,
+                    "rolled_tier": 1
+                },
+                {
+                    "id": "dexterity",
+                    "name": "Geschicklichkeit +",
+                    "type": "dexterity",
+                    "value": 2,
+                    "rolled_tier": 1
+                },
+                {
+                    "id": "magic_power",
+                    "name": "Magiekraft +",
+                    "type": "magic_power",
+                    "value": 2,
+                    "rolled_tier": 1
+                }
+            ]
         },
         "pants": {
             "id": "cloth_pants",
@@ -56,29 +145,45 @@
             "magic_defense": 3,
             "enchantments": []
         },
-        "gloves": null,
+        "gloves": {
+            "id": "steel_gauntlets",
+            "name": "Steel Gauntlets",
+            "item_type": "glove",
+            "item_level": 20,
+            "min_player_level": 14,
+            "material": {
+                "type": "steel",
+                "disassembly_yield": 6
+            },
+            "enchant_slots": 6,
+            "requirements": {
+                "strength": 34,
+                "dexterity": 6,
+                "intelligence": 4
+            },
+            "stats": {
+                "armour": 74,
+                "evasion": 6,
+                "energy_shield": 6,
+                "block_chance": 4,
+                "attack_speed": 0.11238404690510666,
+                "movement_speed": 0,
+                "damage": 0
+            },
+            "enchantments": [
+                {
+                    "id": "attack_power",
+                    "name": "Angriffskraft +",
+                    "type": "attack_power",
+                    "value": 4,
+                    "rolled_tier": 1
+                }
+            ]
+        },
         "boots": null,
         "shield": null,
         "null": null,
-        "glove": {
-            "id": "Leather_Gloves",
-            "name": "Lederhandschuhe",
-            "item_type": "glove",
-            "item_level": 1,
-            "min_player_level": 1,
-            "requirements": {
-                "strength": 1,
-                "dexterity": 2,
-                "intelligence": 0
-            },
-            "base_stats": {
-                "defence": 1,
-                "attack_speed": 1
-            },
-            "attack_speed": 1.0,
-            "enchant_slots": 4,
-            "possible_enchantments": []
-        }
+        "glove": null
     },
     "total_stats": {
         "health": 100,

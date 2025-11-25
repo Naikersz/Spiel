@@ -37,7 +37,9 @@ class TownScene:
     # Button-Callbacks
     # --------------------------------------------------------
     def inventory(self):
-        print("📦 Inventar geöffnet!")
+        from scenes.inventory_scene import InventoryScene
+
+        return InventoryScene(self.slot_index)
 
     def smith(self):
         print("🛠 Schmied geöffnet!")

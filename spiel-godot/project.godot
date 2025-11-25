@@ -11,9 +11,14 @@ config_version=5
 [application]
 
 config/name="SpielGodot"
-run/main_scene="uid://deape0t56pm74"
+run/main_scene="res://scenes/main_menu.tscn"
 config/features=PackedStringArray("4.5", "GL Compatibility")
 config/icon="res://icon.svg"
+
+[autoload]
+
+Constants="*res://core/constants.gd"
+DevSettings="*res://core/dev_settings.gd"
 
 [display]
 

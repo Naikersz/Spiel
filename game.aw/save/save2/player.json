@@ -3,5 +3,181 @@
     "class_id": "warrior",
     "class_name": "Krieger",
     "level": 1,
-    "experience": 0
+    "experience": 0,
+    "equipped": {
+        "gloves": {
+            "id": "dragon_leather_gloves",
+            "name": "Dragon Leather Gloves",
+            "item_type": "glove",
+            "item_level": 40,
+            "min_player_level": 30,
+            "material": {
+                "type": "dragonbone",
+                "disassembly_yield": 20
+            },
+            "enchant_slots": 6,
+            "requirements": {
+                "strength": 74,
+                "dexterity": 33,
+                "intelligence": 0
+            },
+            "stats": {
+                "armour": 474,
+                "evasion": 44,
+                "energy_shield": 11,
+                "block_chance": 6,
+                "attack_speed": 0.3467686180518412,
+                "movement_speed": 0,
+                "damage": 0
+            },
+            "enchantments": [
+                {
+                    "id": "dexterity",
+                    "name": "Geschicklichkeit +",
+                    "type": "dexterity",
+                    "value": 2,
+                    "rolled_tier": 2
+                }
+            ]
+        },
+        "chest": {
+            "id": "chainmail_tunic",
+            "name": "Chainmail Tunic",
+            "item_type": "chest",
+            "item_level": 12,
+            "min_player_level": 8,
+            "material": {
+                "type": "chain",
+                "disassembly_yield": 6
+            },
+            "enchant_slots": 6,
+            "requirements": {
+                "strength": 18,
+                "dexterity": 9,
+                "intelligence": 0
+            },
+            "stats": {
+                "armour": 60,
+                "evasion": 12,
+                "energy_shield": 1,
+                "block_chance": 1,
+                "attack_speed": 0,
+                "movement_speed": 0,
+                "damage": 0
+            },
+            "enchantments": [
+                {
+                    "id": "strength",
+                    "name": "Stärke +",
+                    "type": "strength",
+                    "value": 3,
+                    "rolled_tier": 1
+                }
+            ]
+        },
+        "pants": {
+            "id": "plate_pants",
+            "name": "Plate Pants",
+            "item_type": "pants",
+            "item_level": 40,
+            "min_player_level": 28,
+            "material": {
+                "type": "steel",
+                "disassembly_yield": 12
+            },
+            "enchant_slots": 6,
+            "requirements": {
+                "strength": 75,
+                "dexterity": 5,
+                "intelligence": 0
+            },
+            "stats": {
+                "armour": 360,
+                "evasion": 0,
+                "energy_shield": 2,
+                "block_chance": 7,
+                "attack_speed": 0,
+                "movement_speed": 0,
+                "damage": 0
+            },
+            "enchantments": [
+                {
+                    "id": "crit_multi",
+                    "name": "Kritischer Trefferschaden %",
+                    "type": "crit_multi",
+                    "value": 5,
+                    "rolled_tier": 1
+                }
+            ]
+        },
+        "weapon": {
+            "id": "steel_sword",
+            "name": "Steel Sword",
+            "item_type": "weapon",
+            "item_level": 20,
+            "min_player_level": 14,
+            "material": {
+                "type": "steel",
+                "disassembly_yield": 14
+            },
+            "enchant_slots": 6,
+            "requirements": {
+                "strength": 51,
+                "dexterity": 4,
+                "intelligence": 0
+            },
+            "stats": {
+                "armour": 0,
+                "evasion": 2,
+                "energy_shield": 3,
+                "block_chance": 0,
+                "attack_speed": 0.9589891173570299,
+                "movement_speed": 0,
+                "damage": 56
+            },
+            "enchantments": [
+                {
+                    "id": "magic_power",
+                    "name": "Magiekraft +",
+                    "type": "magic_power",
+                    "value": 3,
+                    "rolled_tier": 1
+                },
+                {
+                    "id": "defence",
+                    "name": "Verteidigung +",
+                    "type": "defence",
+                    "value": 3,
+                    "rolled_tier": 1
+                }
+            ]
+        },
+        "helmet": {
+            "id": "chain_hood",
+            "name": "Chain Hood",
+            "item_type": "helmet",
+            "item_level": 12,
+            "min_player_level": 9,
+            "material": {
+                "type": "chain",
+                "disassembly_yield": 6
+            },
+            "enchant_slots": 6,
+            "requirements": {
+                "strength": 22,
+                "dexterity": 13,
+                "intelligence": 0
+            },
+            "stats": {
+                "armour": 68,
+                "evasion": 12,
+                "energy_shield": 3,
+                "block_chance": 3,
+                "attack_speed": 0,
+                "movement_speed": 0,
+                "damage": 0
+            },
+            "enchantments": []
+        }
+    }
 }
