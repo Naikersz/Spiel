@@ -85,7 +85,11 @@ class TilemapPyBSP:
         
         # Классификация тайлов стен (загружается из JSON)
         self.wall_tile_classification = {}
-        self.mask_to_type = {}  # Маппинг битмасок на типы тайлов
+        self.mask_to_type = {}  # Маппинг битмасок на типы тайлов (старый формат)
+        self.autotile_rules = {}  # Новый формат: маппинг битмасок на списки индексов тайлов
+        
+        # Угол поворота камеры (0, 1, 2, 3 для 0°, 90°, 180°, 270°)
+        self.camera_angle = 0
         
         # Создаём fallback тайл для стен (яркий красный с буквой "W")
         self._create_fallback_wall_tile()
@@ -111,7 +115,7 @@ class TilemapPyBSP:
             pass  # Нет доступа к файлу
         
         return {
-            "tile_size": 64,
+            "tile_size": 32,
             "room_settings": {
                 "min_room_width": 6,
                 "max_room_width": 12,
@@ -124,43 +128,34 @@ class TilemapPyBSP:
         """Загружает изображения тайлов для ортогонального рендеринга"""
         tile_size = 64
         
-        # Загружаем пол из dirt2.png (4 варианта пола + возможные дыры и переходы)
-        dirt2_path = "game/assets/tiles/dirt2.png"
+        # Загружаем пол из lavarock.png
+        lavarock_path = "game/assets/tiles/lavarock.png"
         try:
-            if os.path.exists(dirt2_path):
+            if os.path.exists(lavarock_path):
                 try:
-                    dirt2_tileset = pygame.image.load(dirt2_path)
+                    lavarock_tileset = pygame.image.load(lavarock_path)
                     # Конвертируем только если display инициализирован и видеорежим установлен
                     try:
                         if pygame.display.get_init() and pygame.display.get_surface():
-                            if dirt2_tileset.get_flags() & pygame.SRCALPHA:
-                                dirt2_tileset = dirt2_tileset.convert_alpha()
+                            if lavarock_tileset.get_flags() & pygame.SRCALPHA:
+                                lavarock_tileset = lavarock_tileset.convert_alpha()
                             else:
-                                dirt2_tileset = dirt2_tileset.convert()
+                                lavarock_tileset = lavarock_tileset.convert()
                     except (pygame.error, AttributeError):
                         pass  # Используем изображение без конвертации
-                    tileset_width, tileset_height = dirt2_tileset.get_size()
+                    tileset_width, tileset_height = lavarock_tileset.get_size()
                     tiles_x = tileset_width // tile_size
                     tiles_y = tileset_height // tile_size
                     floor_tiles = []
-                    floor_holes = []
-                    floor_transitions = []
                     
                     for y in range(tiles_y):
                         for x in range(tiles_x):
                             tile_rect = pygame.Rect(x * tile_size, y * tile_size, tile_size, tile_size)
                             if tile_rect.right <= tileset_width and tile_rect.bottom <= tileset_height:
-                                tile = dirt2_tileset.subsurface(tile_rect)
+                                tile = lavarock_tileset.subsurface(tile_rect)
                                 if tile.get_size() != (tile_size, tile_size):
                                     tile = pygame.transform.scale(tile, (tile_size, tile_size))
-                                
-                                # Классифицируем тайл пола
-                                if self._is_hole_tile(tile):
-                                    floor_holes.append(tile)
-                                elif self._is_transition_tile(tile):
-                                    floor_transitions.append(tile)
-                                else:
-                                    floor_tiles.append(tile)
+                                floor_tiles.append(tile)
                     
                     # Сохраняем варианты пола (минимум 4)
                     if len(floor_tiles) < 4 and floor_tiles:
@@ -169,50 +164,11 @@ class TilemapPyBSP:
                             floor_tiles.append(random.choice(floor_tiles))
                     
                     self.tile_images["floor"] = floor_tiles
-                    self.tile_images["floor_holes"] = floor_holes
-                    self.tile_images["floor_transitions"] = floor_transitions
-                    logger.info(f"Loaded {len(floor_tiles)} floor tiles, {len(floor_holes)} holes, "
-                              f"{len(floor_transitions)} transitions from dirt2.png")
+                    logger.info(f"Loaded {len(floor_tiles)} floor tiles from lavarock.png")
                 except Exception as e:
-                    logger.error(f"Error loading dirt2.png: {e}")
+                    logger.error(f"Error loading lavarock.png: {e}")
         except OSError:
-            pass
-        
-        # Fallback: пытаемся lavarock.png если dirt2 не найден
-        if not self.tile_images.get("floor"):
-            lavarock_path = "game/assets/tiles/lavarock.png"
-            try:
-                if os.path.exists(lavarock_path):
-                    try:
-                        lavarock_tileset = pygame.image.load(lavarock_path)
-                        # Конвертируем только если display инициализирован и видеорежим установлен
-                        try:
-                            if pygame.display.get_init() and pygame.display.get_surface():
-                                if lavarock_tileset.get_flags() & pygame.SRCALPHA:
-                                    lavarock_tileset = lavarock_tileset.convert_alpha()
-                                else:
-                                    lavarock_tileset = lavarock_tileset.convert()
-                        except (pygame.error, AttributeError):
-                            pass  # Используем изображение без конвертации
-                        tileset_width, tileset_height = lavarock_tileset.get_size()
-                        tiles_x = tileset_width // tile_size
-                        tiles_y = tileset_height // tile_size
-                        floor_tiles = []
-                        for y in range(tiles_y):
-                            for x in range(tiles_x):
-                                tile_rect = pygame.Rect(x * tile_size, y * tile_size, tile_size, tile_size)
-                                if tile_rect.right <= tileset_width and tile_rect.bottom <= tileset_height:
-                                    tile = lavarock_tileset.subsurface(tile_rect)
-                                    if tile.get_size() != (tile_size, tile_size):
-                                        tile = pygame.transform.scale(tile, (tile_size, tile_size))
-                                    floor_tiles.append(tile)
-                        self.tile_images["floor"] = floor_tiles
-                        logger.info(f"Loaded {len(floor_tiles)} floor tiles from lavarock.png (fallback)")
-                    except Exception as e:
-                        logger.error(f"Error loading lavarock.png: {e}")
-            except OSError:
-                pass
-        
+            pass   
         # Загружаем стены из dungeon.png (основной tileset стен)
         dungeon_path = "game/assets/tiles/dungeon.png"
         try:
@@ -450,7 +406,7 @@ class TilemapPyBSP:
         logger.info(f"Generated {len(self.rooms)} rooms, {len(self.corridors)} corridors")
     
     def _load_wall_tile_classification(self):
-        """Загружает классификацию тайлов стен из JSON файла с битмасками (с обработкой ошибок)"""
+        """Загружает классификацию тайлов стен из JSON файла с битмасками (новый формат с индексами)"""
         json_path = "wall_tiles.json"
         try:
             if os.path.exists(json_path):
@@ -458,22 +414,24 @@ class TilemapPyBSP:
                     import json
                     with open(json_path, 'r', encoding='utf-8') as f:
                         classification = json.load(f)
-                        self.wall_tile_classification = classification.get("tiles", {})
-                        self.mask_to_type = classification.get("mask_to_type", {})
+                        # Новый формат: autotile_rules содержит маппинг битмасок на списки индексов
+                        self.autotile_rules = classification.get("autotile_rules", {})
+                        # Сохраняем путь к tileset изображению
+                        self.tileset_image_path = classification.get("tileset_image", "game/assets/tiles/dungeon.png")
                         logger.info(f"Loaded wall tile classification from {json_path}")
-                        logger.info(f"  Categories: {list(self.wall_tile_classification.keys())}")
-                        logger.info(f"  Mask mappings: {len(self.mask_to_type)} patterns")
+                        logger.info(f"  Autotile rules: {len(self.autotile_rules)} patterns")
+                        logger.info(f"  Tileset image: {self.tileset_image_path}")
                 except (OSError, IOError, json.JSONDecodeError) as e:
                     logger.error(f"Error loading wall tile classification: {e}")
-                    self.wall_tile_classification = {}
-                    self.mask_to_type = {}
+                    self.autotile_rules = {}
+                    self.tileset_image_path = "game/assets/tiles/dungeon.png"
             else:
-                self.wall_tile_classification = {}
-                self.mask_to_type = {}
+                self.autotile_rules = {}
+                self.tileset_image_path = "game/assets/tiles/dungeon.png"
                 logger.debug(f"Wall tile classification not found: {json_path}")
         except OSError:
-            self.wall_tile_classification = {}
-            self.mask_to_type = {}
+            self.autotile_rules = {}
+            self.tileset_image_path = "game/assets/tiles/dungeon.png"
     
     def _is_hole_tile(self, tile: pygame.Surface) -> bool:
         """Проверяет, является ли тайл пола дырой"""
@@ -843,105 +801,266 @@ class TilemapPyBSP:
         print("=" * 30 + "\n")
     
     def _get_wall_tile_by_neighbors(self, x: int, y: int) -> pygame.Surface:
-        """
-        Выбирает правильный тайл стены на основе соседей (автотайлинг с битмаскированием)
-        ВСЕГДА возвращает тайл (никогда None) - использует fallback если нужно
-        """
-        # Проверяем кэш
         cache_key = (x, y)
         if cache_key in self.cached_wall_tiles:
             return self.cached_wall_tiles[cache_key]
-        
-        tile_size = self.tile_size
-        dungeon_tiles = self.tile_images.get("wall", [])
-        dungeon_tileset = self.tile_images.get("dungeon_tileset")
-        
-        # Создаём битовую маску соседей: 8 направлений
-        # Битмаска: 8 бит для 8 направлений (N, NE, E, SE, S, SW, W, NW)
-        # 1 = пол рядом, 0 = стена/пустота рядом
+
         mask = 0
-        
         directions = [
-            ((0, -1), 0),    # N  - бит 0 (1)
-            ((1, -1), 1),    # NE - бит 1 (2)
-            ((1, 0), 2),     # E  - бит 2 (4)
-            ((1, 1), 3),     # SE - бит 3 (8)
-            ((0, 1), 4),     # S  - бит 4 (16)
-            ((-1, 1), 5),    # SW - бит 5 (32)
-            ((-1, 0), 6),    # W  - бит 6 (64)
-            ((-1, -1), 7)    # NW - бит 7 (128)
+            ((0, -1), 0), ((1, -1), 1), ((1, 0), 2), ((1, 1), 3),
+            ((0, 1), 4), ((-1, 1), 5), ((-1, 0), 6), ((-1, -1), 7)
         ]
         
         for (dx, dy), bit_pos in directions:
             nx, ny = x + dx, y + dy
             if 0 <= nx < self.width and 0 <= ny < self.height:
-                if self.map_data[ny][nx] != 0:  # НЕ стена
+                if self.map_data[ny][nx] != 0:  # НЕ стена → пол или пустота
                     mask |= (1 << bit_pos)
         
-        # Используем маппинг битмасок из JSON если доступен
-        mask_to_type = getattr(self, 'mask_to_type', {})
-        tile_type = None
+        # Поворачиваем битмаску в соответствии с углом камеры
+        mask = self._rotate_mask(mask, self.camera_angle)
         
-        if mask_to_type and str(mask) in mask_to_type:
-            tile_type = mask_to_type[str(mask)]
-        else:
-            tile_type = self._determine_tile_type_by_mask(mask)
+        # Загружаем правила
+        rules = getattr(self, 'autotile_rules', {})
+        indices = rules.get(str(mask)) or [0]  # если маска не найдена → 0
         
-        # Получаем тайл из классификации
-        result_tile = None
+        # Инициализируем chosen_index значением по умолчанию
+        chosen_index = 0
+        
         try:
-            if tile_type and self.wall_tile_classification.get(tile_type):
-                tile_info_list = self.wall_tile_classification[tile_type]
-                if tile_info_list and dungeon_tileset:
-                    tile_info = random.choice(tile_info_list)
-                    tile_x = tile_info.get("pixel_x", 0)
-                    tile_y = tile_info.get("pixel_y", 0)
-                    # Проверяем границы tileset (критично!)
-                    tileset_w, tileset_h = dungeon_tileset.get_size()
-                    if 0 <= tile_x < tileset_w - tile_size and 0 <= tile_y < tileset_h - tile_size:
-                        result_tile = dungeon_tileset.subsurface((tile_x, tile_y, tile_size, tile_size))
-                        # Масштабируем если нужно
-                        if result_tile.get_size() != (tile_size, tile_size):
-                            result_tile = pygame.transform.scale(result_tile, (tile_size, tile_size))
-        except (KeyError, IndexError, ValueError, pygame.error) as e:
-            logger.debug(f"_get_wall_tile_by_neighbors error at ({x}, {y}): {e}")
+            # Выбираем случайный индекс из списка
+            if indices:
+                chosen_index = random.choice(indices)
+            
+            # Если это боковая стена — выбираем правильную часть по высоте
+            if chosen_index in {3, 4, 16, 17, 42, 43}:
+                chosen_index = self._select_side_wall_part(x, y, [3, 4, 16, 17, 42, 43])
+        except (IndexError, ValueError) as e:
+            logger.debug(f"Error choosing tile index at ({x}, {y}): {e}")
+            chosen_index = 0
         
-        # Fallback 1: случайный тайл из всех доступных
-        if not result_tile and dungeon_tiles:
+        # Берём тайл из dungeon_tileset
+        tileset = self.tile_images.get("dungeon_tileset")
+        if tileset:
             try:
-                result_tile = random.choice(dungeon_tiles)
-                # Масштабируем если нужно
-                if result_tile.get_size() != (tile_size, tile_size):
-                    result_tile = pygame.transform.scale(result_tile, (tile_size, tile_size))
-            except (IndexError, ValueError):
-                pass
+                tile = self._get_tile_by_index(tileset, chosen_index, self.tile_size)
+                if tile and tile.get_size() != (self.tile_size, self.tile_size):
+                    tile = pygame.transform.scale(tile, (self.tile_size, self.tile_size))
+                if not tile:
+                    tile = self.fallback_wall_tile
+            except (KeyError, IndexError, ValueError, pygame.error) as e:
+                logger.debug(f"_get_wall_tile_by_neighbors error at ({x}, {y}): {e}")
+                tile = self.fallback_wall_tile
+        else:
+            tile = self.fallback_wall_tile
         
-        # Fallback 2: яркий красный тайл с буквой "W"
-        if not result_tile:
-            result_tile = self.fallback_wall_tile
+        self.cached_wall_tiles[cache_key] = tile
+        return tile
+    
+    def _rotate_mask(self, mask: int, angle: int) -> int:
+        """
+        Поворачивает 8-битную Wang mask на угол (0, 1, 2, 3 для 0°, 90°, 180°, 270°)
         
-        # Кэшируем результат
-        self.cached_wall_tiles[cache_key] = result_tile
-        return result_tile
+        Битмаска: N NE E SE S SW W NW (биты 0-7)
+        Поворот по часовой стрелке: N→E→S→W→N
+        
+        Args:
+            mask: Исходная битмаска
+            angle: Угол поворота (0, 1, 2, 3)
+            
+        Returns:
+            int: Повернутая битмаска
+        """
+        if angle == 0:
+            return mask
+        
+        # Извлекаем биты для каждого направления
+        # Исходный порядок: N(0), NE(1), E(2), SE(3), S(4), SW(5), W(6), NW(7)
+        bits = [
+            (mask >> 0) & 1,  # N
+            (mask >> 1) & 1,  # NE
+            (mask >> 2) & 1,  # E
+            (mask >> 3) & 1,  # SE
+            (mask >> 4) & 1,  # S
+            (mask >> 5) & 1,  # SW
+            (mask >> 6) & 1,  # W
+            (mask >> 7) & 1   # NW
+        ]
+        
+        # Поворот на 90° по часовой стрелке: N→E, E→S, S→W, W→N
+        # Также поворачиваем диагонали: NE→SE, SE→SW, SW→NW, NW→NE
+        rotated_bits = [0] * 8
+        
+        if angle == 1:  # 90° по часовой
+            rotated_bits[0] = bits[6]  # N ← W
+            rotated_bits[1] = bits[7]  # NE ← NW
+            rotated_bits[2] = bits[0]  # E ← N
+            rotated_bits[3] = bits[1]  # SE ← NE
+            rotated_bits[4] = bits[2]  # S ← E
+            rotated_bits[5] = bits[3]  # SW ← SE
+            rotated_bits[6] = bits[4]  # W ← S
+            rotated_bits[7] = bits[5]  # NW ← SW
+        elif angle == 2:  # 180°
+            rotated_bits[0] = bits[4]  # N ← S
+            rotated_bits[1] = bits[5]  # NE ← SW
+            rotated_bits[2] = bits[6]  # E ← W
+            rotated_bits[3] = bits[7]  # SE ← NW
+            rotated_bits[4] = bits[0]  # S ← N
+            rotated_bits[5] = bits[1]  # SW ← NE
+            rotated_bits[6] = bits[2]  # W ← E
+            rotated_bits[7] = bits[3]  # NW ← SE
+        elif angle == 3:  # 270° (90° против часовой)
+            rotated_bits[0] = bits[2]  # N ← E
+            rotated_bits[1] = bits[3]  # NE ← SE
+            rotated_bits[2] = bits[4]  # E ← S
+            rotated_bits[3] = bits[5]  # SE ← SW
+            rotated_bits[4] = bits[6]  # S ← W
+            rotated_bits[5] = bits[7]  # SW ← NW
+            rotated_bits[6] = bits[0]  # W ← N
+            rotated_bits[7] = bits[1]  # NW ← NE
+        
+        # Собираем новую маску
+        rotated_mask = 0
+        for i, bit in enumerate(rotated_bits):
+            if bit:
+                rotated_mask |= (1 << i)
+        
+        return rotated_mask
+    
+    def _rotate_map_data_clockwise(self):
+        """Поворачивает всю карту (map_data) на 90° по часовой стрелке"""
+        old_data = self.map_data
+        old_width = self.width
+        old_height = self.height
+        
+        self.width, self.height = old_height, old_width
+        self.map_data = [
+            [old_data[old_height - 1 - j][i] for j in range(old_height)]
+            for i in range(old_width)
+        ]
+    
+    def _rotate_coordinates_clockwise(self, px: int, py: int, old_width: int, old_height: int) -> Tuple[int, int]:
+        """
+        Преобразует координаты точки при повороте карты на 90° по часовой стрелке
+        
+        Args:
+            px: X координата в пикселях (старая система координат)
+            py: Y координата в пикселях (старая система координат)
+            old_width: Старая ширина карты в тайлах (не используется, но оставлен для консистентности)
+            old_height: Старая высота карты в тайлах
+            
+        Returns:
+            Tuple[int, int]: Новые координаты (new_px, new_py) в пикселях
+        """
+        tile_size = self.tile_size
+        
+        # Преобразуем пиксели в тайлы и смещение внутри тайла
+        old_tile_x = px // tile_size
+        old_tile_y = py // tile_size
+        offset_x = px % tile_size
+        offset_y = py % tile_size
+        
+        # Поворот координат в тайлах: (x, y) → (old_height - 1 - y, x)
+        new_tile_x = old_height - 1 - old_tile_y
+        new_tile_y = old_tile_x
+        
+        # При повороте смещения тоже меняются:
+        # Старое смещение по X становится новым смещением по Y
+        # Старое смещение по Y становится обратным смещением по X
+        new_offset_x = offset_y
+        new_offset_y = tile_size - 1 - offset_x
+        
+        # Преобразуем обратно в пиксели
+        new_px = new_tile_x * tile_size + new_offset_x
+        new_py = new_tile_y * tile_size + new_offset_y
+        
+        return (new_px, new_py)
+    
+    def rotate_map(self, player_x: Optional[int] = None, player_y: Optional[int] = None,
+                   camera_x: Optional[int] = None, camera_y: Optional[int] = None,
+                   screen_width: Optional[int] = None, screen_height: Optional[int] = None) -> Tuple[Optional[int], Optional[int], Optional[int], Optional[int]]:
+        """
+        Поворачивает всю карту на 90° по часовой стрелке и преобразует координаты
+        
+        Args:
+            player_x: Текущая X координата игрока в пикселях (опционально)
+            player_y: Текущая Y координата игрока в пикселях (опционально)
+            camera_x: Текущая X координата камеры в пикселях (опционально)
+            camera_y: Текущая Y координата камеры в пикселях (опционально)
+            screen_width: Ширина экрана в пикселях (опционально, для ограничения камеры)
+            screen_height: Высота экрана в пикселях (опционально, для ограничения камеры)
+            
+        Returns:
+            Tuple[Optional[int], Optional[int], Optional[int], Optional[int]]:
+            (new_player_x, new_player_y, new_camera_x, new_camera_y) или None если не переданы
+        """
+        # Сохраняем старые размеры для преобразования координат
+        old_width = self.width
+        old_height = self.height
+        
+        self.camera_angle = (self.camera_angle + 1) % 4
+        
+        # 1. Поворачиваем саму карту
+        self._rotate_map_data_clockwise()
+        
+        # 2. Очищаем кэши
+        self.cached_wall_tiles.clear()
+        self.scaled_cache.clear()
+        
+        # 3. Преобразуем координаты игрока и камеры
+        new_player_x = None
+        new_player_y = None
+        new_camera_x = None
+        new_camera_y = None
+        
+        if player_x is not None and player_y is not None:
+            new_player_x, new_player_y = self._rotate_coordinates_clockwise(
+                player_x, player_y, old_width, old_height
+            )
+            # Ограничиваем координаты игрока границами новой карты
+            max_x = (self.width * self.tile_size) - 1
+            max_y = (self.height * self.tile_size) - 1
+            new_player_x = max(0, min(new_player_x, max_x))
+            new_player_y = max(0, min(new_player_y, max_y))
+        
+        if camera_x is not None and camera_y is not None:
+            new_camera_x, new_camera_y = self._rotate_coordinates_clockwise(
+                camera_x, camera_y, old_width, old_height
+            )
+            # Ограничиваем координаты камеры границами новой карты
+            if screen_width and screen_height:
+                max_camera_x = max(0, (self.width * self.tile_size) - screen_width)
+                max_camera_y = max(0, (self.height * self.tile_size) - screen_height)
+                new_camera_x = max(0, min(new_camera_x, max_camera_x))
+                new_camera_y = max(0, min(new_camera_y, max_camera_y))
+            else:
+                max_camera_x = (self.width * self.tile_size) - 1
+                max_camera_y = (self.height * self.tile_size) - 1
+                new_camera_x = max(0, min(new_camera_x, max_camera_x))
+                new_camera_y = max(0, min(new_camera_y, max_camera_y))
+        
+        logger.info(f"Карта физически повернута на {self.camera_angle * 90}° (по часовой)")
+        
+        return (new_player_x, new_player_y, new_camera_x, new_camera_y)
     
     def _determine_tile_type_by_mask(self, mask: int) -> str:
         """
         Определяет тип тайла стены по битмаске (fallback если нет маппинга в JSON)
-        Проверенный автотайлинг с полной поддержкой всех паттернов
+        Использует данные из wall_tiles.json для корректного автотейлинга
         """
         # 8-битная маска: N NE E SE S SW W NW
-        n  = mask & 1
-        ne = mask & 2
-        e  = mask & 4
-        se = mask & 8
-        s  = mask & 16
-        sw = mask & 32
-        w  = mask & 64
-        nw = mask & 128
+        n  = bool(mask & 1)
+        ne = bool(mask & 2)
+        e  = bool(mask & 4)
+        se = bool(mask & 8)
+        s  = bool(mask & 16)
+        sw = bool(mask & 32)
+        w  = bool(mask & 64)
+        nw = bool(mask & 128)
         
-        # 1. Полная стена (ни одного проёма)
+        # 1. Полная стена (ни одного проёма) - используем прямую стену
         if mask == 0:
-            return "wall_full"
+            return "wall_straight"
         
         # 2. Арки (проём в одну сторону)
         if mask == 1:   return "arch_n"
@@ -950,49 +1069,198 @@ class TilemapPyBSP:
         if mask == 64:  return "arch_w"
         
         # 3. Углы внешние (проём в диагонали)
-        if mask == 2:   return "corner_outer_ne"
-        if mask == 8:   return "corner_outer_se"
-        if mask == 32:  return "corner_outer_sw"
-        if mask == 128: return "corner_outer_nw"
+        if mask == 2:   return "corner_outer"  # NE
+        if mask == 8:   return "corner_outer"  # SE
+        if mask == 32:  return "corner_outer"  # SW
+        if mask == 128: return "corner_outer"  # NW
         
-        # 4. Углы внутренние
-        if (n and w and not nw): return "corner_inner_nw"
-        if (n and e and not ne): return "corner_inner_ne"
-        if (s and e and not se): return "corner_inner_se"
-        if (s and w and not sw): return "corner_inner_sw"
+        # 4. Углы внутренние (пол в двух смежных направлениях, но не в диагонали)
+        if (n and w and not nw): return "corner_inner"  # NW
+        if (n and e and not ne): return "corner_inner"  # NE
+        if (s and e and not se): return "corner_inner"  # SE
+        if (s and w and not sw): return "corner_inner"  # SW
         
-        # 5. Горизонтальные стены
-        if n and s:
-            return "wall_horizontal_mid"
-        if n:
-            return "wall_horizontal_bottom"
-        if s:
-            return "wall_horizontal_top"
+        # 5. Вертикальные стены (пол слева или справа)
+        if w and not e:  # Пол только слева - правая сторона
+            return "wall_right"
+        if e and not w:  # Пол только справа - левая сторона
+            return "wall_left"
+        if w and e:  # Пол с обеих сторон - прямая стена
+            return "wall_straight"
         
-        # 6. Вертикальные стены
-        if w and e:
-            return "wall_vertical_mid"
-        if w:
-            return "wall_vertical_right"
-        if e:
-            return "wall_vertical_left"
+        # 6. Горизонтальные стены (пол сверху или снизу)
+        if n and not s:  # Пол только сверху
+            return "wall_straight"
+        if s and not n:  # Пол только снизу
+            return "wall_straight"
+        if n and s:  # Пол сверху и снизу
+            return "wall_straight"
         
-        # 7. T-перекрёстки
-        if n and s and w: return "t_junction_w"
-        if n and s and e: return "t_junction_e"
-        if w and e and n: return "t_junction_n"
-        if w and e and s: return "t_junction_s"
+        # 7. T-перекрёстки и перекрёстки - используем прямую стену
+        if n and s and w: return "wall_straight"
+        if n and s and e: return "wall_straight"
+        if w and e and n: return "wall_straight"
+        if w and e and s: return "wall_straight"
+        if n and s and w and e: return "wall_straight"
         
-        # 8. Перекрёсток
-        if n and s and w and e: return "crossroads"
+        # 8. Концы - используем прямую стену
+        if n: return "wall_straight"
+        if e: return "wall_straight"
+        if s: return "wall_straight"
+        if w: return "wall_straight"
         
-        # 9. Концы
-        if n: return "wall_end_n"
-        if e: return "wall_end_e"
-        if s: return "wall_end_s"
-        if w: return "wall_end_w"
+        # Fallback: прямая стена
+        return "wall_straight"
+    
+    def _get_tile_by_index(self, tileset: pygame.Surface, tile_index: int, tile_size: int) -> pygame.Surface:
+        """
+        Извлекает тайл из tileset по индексу (grid-based)
         
-        return "wall_full"
+        Args:
+            tileset: Изображение tileset
+            tile_index: Индекс тайла (0-based, слева направо, сверху вниз)
+            tile_size: Размер одного тайла в пикселях
+            
+        Returns:
+            pygame.Surface: Извлеченный тайл
+        """
+        tileset_w, tileset_h = tileset.get_size()
+        tiles_per_row = tileset_w // tile_size
+        
+        # Вычисляем координаты тайла в grid
+        tile_x = (tile_index % tiles_per_row) * tile_size
+        tile_y = (tile_index // tiles_per_row) * tile_size
+        
+        # Проверяем границы
+        if 0 <= tile_x < tileset_w and 0 <= tile_y < tileset_h:
+            # Извлекаем тайл
+            tile = tileset.subsurface((tile_x, tile_y, tile_size, tile_size))
+            # Масштабируем если нужно
+            if tile.get_size() != (tile_size, tile_size):
+                tile = pygame.transform.scale(tile, (tile_size, tile_size))
+            return tile
+        
+        # Fallback: возвращаем пустой тайл
+        return pygame.Surface((tile_size, tile_size))
+    
+    def _select_side_wall_part(self, x: int, y: int, tile_indices: list) -> int:
+        """
+        Выбирает правильную часть боковой стены на основе позиции относительно пола
+        
+        Для боковых стен (перпендикулярно персонажу) нужно выбирать часть стены
+        на основе высоты: нижняя часть у пола, средние части, верхняя часть.
+        
+        Args:
+            x: X координата тайла стены
+            y: Y координата тайла стены
+            tile_indices: Список индексов тайлов для боковой стены [3, 4, 16, 17, 42, 43]
+            
+        Returns:
+            int: Индекс тайла из списка
+        """
+        # Определяем позицию тайла относительно пола
+        position_from_floor = self._get_wall_position_from_floor(x, y)
+        
+        # Маппинг позиции на индекс в списке
+        # Предполагаем, что индексы идут снизу вверх:
+        # [3, 4, 16, 17, 42, 43] = [нижняя1, нижняя2, средняя1, средняя2, верхняя1, верхняя2]
+        if len(tile_indices) >= 6:
+            if position_from_floor == 0:
+                # Нижняя часть у пола - выбираем из первых двух
+                return random.choice(tile_indices[0:2])
+            elif position_from_floor == 1:
+                # Первая средняя часть
+                return random.choice(tile_indices[2:4]) if len(tile_indices) >= 4 else tile_indices[2]
+            else:
+                # Верхняя часть (позиция 2+)
+                return random.choice(tile_indices[4:6]) if len(tile_indices) >= 6 else tile_indices[-1]
+        else:
+            # Если список короче, используем простой выбор
+            return random.choice(tile_indices)
+    
+    def _get_wall_position_from_floor(self, x: int, y: int) -> int:
+        """
+        Определяет позицию тайла стены относительно пола (снизу вверх)
+        
+        Ищет ближайший пол снизу и считает, на какой позиции находится этот тайл стены.
+        Позиция 0 = тайл у пола (нижняя часть арки)
+        Позиция 1 = первый тайл над полом (первая средняя часть)
+        Позиция 2 = второй тайл над полом (вторая средняя часть)
+        Позиция 3+ = верхние тайлы (верхняя часть арки)
+        
+        Args:
+            x: X координата тайла стены
+            y: Y координата тайла стены
+            
+        Returns:
+            int: Позиция тайла относительно пола (0 = у пола, 1+ = выше)
+        """
+        # Ищем пол снизу (стены обычно находятся над полом)
+        current_y = y + 1
+        floor_y = None
+        
+        # Ищем ближайший пол снизу (вниз по Y)
+        while current_y < self.height:
+            if self.map_data[current_y][x] == 1:  # Пол
+                floor_y = current_y
+                break
+            current_y += 1
+        
+        # Если пол не найден снизу, ищем сверху (для стен над полом)
+        if floor_y is None:
+            current_y = y - 1
+            while current_y >= 0:
+                if self.map_data[current_y][x] == 1:  # Пол
+                    floor_y = current_y
+                    break
+                current_y -= 1
+        
+        # Если пол найден, вычисляем позицию
+        if floor_y is not None:
+            # Позиция = расстояние от пола до этого тайла стены
+            # Если пол снизу (floor_y > y), позиция = floor_y - y - 1
+            # Если пол сверху (floor_y < y), позиция = y - floor_y - 1
+            if floor_y > y:
+                # Пол снизу - стена над полом
+                position = floor_y - y - 1
+            else:
+                # Пол сверху - стена под полом (необычно, но возможно)
+                position = y - floor_y - 1
+            return max(0, position)
+        
+        # Если пол не найден, считаем что это нижний тайл (позиция 0)
+        return 0
+    
+    def _select_arch_part(self, arch_type: str, position_from_floor: int) -> str:
+        """
+        Выбирает правильную часть арки на основе позиции относительно пола
+        
+        Последовательность арки снизу вверх:
+        - arch_bottom (y=224) - нижняя часть у пола (позиция 0)
+        - arch_mid_lower (y=192) - первая средняя часть (позиция 1)
+        - arch_mid_upper (y=160) - вторая средняя часть (позиция 2)
+        - arch_top (y=128) - верхняя часть (позиция 3+)
+        
+        Args:
+            arch_type: Базовый тип арки (arch_n, arch_s, arch_e, arch_w)
+            position_from_floor: Позиция тайла относительно пола (0 = у пола)
+            
+        Returns:
+            str: Тип части арки с учетом позиции
+        """
+        # Выбираем часть арки на основе позиции
+        if position_from_floor == 0:
+            # Нижняя часть у пола
+            return "arch_bottom"
+        elif position_from_floor == 1:
+            # Первая средняя часть
+            return "arch_mid_lower"
+        elif position_from_floor == 2:
+            # Вторая средняя часть
+            return "arch_mid_upper"
+        else:
+            # Верхняя часть (позиция 3+)
+            return "arch_top"
     
     def draw(self, screen: pygame.Surface, camera_x: int, camera_y: int):
         """Отрисовывает карту на экране (ортогональная проекция)"""

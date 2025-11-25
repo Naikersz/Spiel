@@ -268,12 +268,18 @@ class MainMenu(BaseMenu):
         """Проверяет наличие сохранений"""
         try:
             import os
-            base_path = os.path.abspath(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))
+            # Путь вычисляется правильно: menu_system.py находится в game/
+            # Нужно подняться на 2 уровня: game/ -> корень проекта
+            base_path = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
             from game.player.player_manager import PlayerManager
             player_manager = PlayerManager(base_path)
             all_characters = player_manager.get_all_characters()
+            print(f"[DEBUG] _check_saves_exist: base_path={base_path}, found {len(all_characters)} characters")
             return len(all_characters) > 0
-        except Exception:
+        except Exception as e:
+            print(f"[DEBUG] _check_saves_exist error: {e}")
+            import traceback
+            traceback.print_exc()
             return False
     
     def refresh_buttons(self):
