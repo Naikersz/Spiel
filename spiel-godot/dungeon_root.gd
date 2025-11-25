@@ -1,32 +1,23 @@
-extends TileMap
+extends Node2D
 
-# ---------- НАСТРОЙКА ПОД ТВОЙ TILESET ----------
-
-@export var map_width_tiles: int  = 60
+# ========== НАСТРОЙКИ ==========
+@export var map_width_tiles: int = 60
 @export var map_height_tiles: int = 40
-
 @export var min_room_size: int = 6
 @export var max_room_size: int = 12
-@export var max_depth: int     = 8
+@export var max_depth: int = 8
 
-@export var TERRAIN_SET_INDEX: int = 0
-@export var TERRAIN_WALL: int      = 0
-@export var FLOOR_SOURCE_ID: int = 0
-@export var FLOOR_ATLAS_COORD: Vector2i = Vector2i(2, 8)
+# ========== ССЫЛКИ НА TileMapLayer (ВАЖНО: НЕ TileMap!) ==========
+@onready var floor_layer: TileMapLayer = $TileMapFloor/FloorLayer
+@onready var wall_layer: TileMapLayer = $TileMapFloor/WallLayer
+@onready var top_layer: TileMapLayer = $TileMapFloor/TopLayer  
 
-# ---------- ВНУТРЕННЯЯ КАРТА ----------
-
-enum TileType {
-	EMPTY,
-	FLOOR,
-	WALL
-}
-
+# ========== ВНУТРЕННЯЯ КАРТА ==========
+enum TileType { EMPTY, FLOOR, WALL }
 var _grid: Array = []
 var _rng := RandomNumberGenerator.new()
 
 # ---------- BSP УЗЕЛ ----------
-
 class BSPNode:
 	var rect: Rect2i
 	var left: BSPNode = null
@@ -38,16 +29,14 @@ class BSPNode:
 
 var _bsp_root: BSPNode = null
 
-# ---------- START ----------
 
-func _ready() -> void:
+func _ready():
 	_rng.randomize()
 	generate_dungeon()
 
-# ---------- ГЛАВНАЯ ФУНКЦИЯ ----------
 
-func generate_dungeon() -> void:
-	clear()
+# ---------- ГЛАВНАЯ ----------
+func generate_dungeon():
 	_make_empty_grid()
 
 	var root_rect := Rect2i(0, 0, map_width_tiles, map_height_tiles)
@@ -57,7 +46,8 @@ func generate_dungeon() -> void:
 	_connect_adjacent_leaves(_bsp_root)
 
 	_create_walls_around_floor()
-	_apply_grid_to_tilemap()
+	_apply_grid_to_layers()
+
 
 # ---------- СОЗДАНИЕ ПУСТОЙ СЕТКИ ----------
 
@@ -225,39 +215,47 @@ func _carve_v_corridor(y1: int, y2: int, x: int) -> void:
 # ---------- СОЗДАЁМ СТЕНЫ ВОКРУГ ПОЛА ----------
 
 func _create_walls_around_floor() -> void:
-	# 1) Ставим стены вокруг пола (8-соседей)
-	for y in range(map_height_tiles):
-		for x in range(map_width_tiles):
+	var new_walls: Array[Vector2i] = []
+	
+	# Проходим ТОЛЬКО по клеткам с полом
+	for y in map_height_tiles:
+		for x in map_width_tiles:
 			var pos := Vector2i(x, y)
-
-			if _get_grid(pos) != TileType.EMPTY:
+			if _get_grid(pos) != TileType.FLOOR:
 				continue
-
-			var has_floor := false
-
-			for dy in range(-1, 2):
-				for dx in range(-1, 2):
+				
+			# Проверяем 8 соседей
+			for dy in [-1, 0, 1]:
+				for dx in [-1, 0, 1]:
 					if dx == 0 and dy == 0:
 						continue
-					var npos := pos + Vector2i(dx, dy)
-					if _get_grid(npos) == TileType.FLOOR:
-						has_floor = true
-						break
-				if has_floor:
-					break
-
-			if has_floor:
-				_set_grid(pos, TileType.WALL)
-
-	# 2) Жёсткая рамка по краю карты (пол на границе запрещён)
-	for x in range(map_width_tiles):
-		_set_grid(Vector2i(x, 0), TileType.WALL)
-		_set_grid(Vector2i(x, map_height_tiles - 1), TileType.WALL)
-
-	for y in range(map_height_tiles):
-		_set_grid(Vector2i(0, y), TileType.WALL)
-		_set_grid(Vector2i(map_width_tiles - 1, y), TileType.WALL)
-
+					var neighbor := pos + Vector2i(dx, dy)
+					
+					# Если сосед за пределами или EMPTY → это место для стены
+					if !_is_in_bounds(neighbor) or _get_grid(neighbor) == TileType.EMPTY:
+						# Но только если там ещё НЕ пол и НЕ стена (на всякий случай)
+						if _get_grid(neighbor) != TileType.FLOOR:
+							new_walls.append(neighbor)
+	
+	# Теперь ОДНИМ проходом ставим все стены
+	for wall_pos in new_walls:
+		_set_grid(wall_pos, TileType.WALL)
+	
+	# Опционально: рамка по краям
+	for x in map_width_tiles:
+		if _get_grid(Vector2i(x, 0)) != TileType.FLOOR:
+			_set_grid(Vector2i(x, 0), TileType.WALL)
+		if _get_grid(Vector2i(x, map_height_tiles - 1)) != TileType.FLOOR:
+			_set_grid(Vector2i(x, map_height_tiles - 1), TileType.WALL)
+	for y in map_height_tiles:
+		if _get_grid(Vector2i(0, y)) != TileType.FLOOR:
+			_set_grid(Vector2i(0, y), TileType.WALL)
+		if _get_grid(Vector2i(map_width_tiles - 1, y)) != TileType.FLOOR:
+			_set_grid(Vector2i(map_width_tiles - 1, y), TileType.WALL)
+			
+func _is_in_bounds(pos: Vector2i) -> bool:
+	return pos.x >= 0 && pos.y >= 0 && pos.x < map_width_tiles && pos.y < map_height_tiles
+	
 func _count_neighbors(pos: Vector2i) -> int:
 	var dirs = [
 		Vector2i(1, 0),
@@ -273,40 +271,6 @@ func _count_neighbors(pos: Vector2i) -> int:
 			c += 1
 
 	return c
-
-# ---------- ПРИМЕНЯЕМ КАРТУ К TILEMAP ----------
-
-func _apply_grid_to_tilemap() -> void:
-	clear()
-
-	var wall_cells := PackedVector2Array()
-
-	for y in map_height_tiles:
-		for x in map_width_tiles:
-			var pos := Vector2i(x, y)
-			match _get_grid(pos):
-				TileType.FLOOR:
-					# Пол рисуем обычным тайлом, без TerrainSet
-					set_cell(0, pos, FLOOR_SOURCE_ID, FLOOR_ATLAS_COORD)
-				TileType.WALL:
-					# Стены копим для автотейла
-					wall_cells.append(pos)
-				_:
-					pass
-
-	print("WALL CELLS:", wall_cells.size())
-
-	# Автотейлинг только для стен (Brick)
-	if wall_cells.size() > 0:
-		set_cells_terrain_connect(
-			0,                  # layer
-			wall_cells,
-			TERRAIN_WALL,       # Brick
-			TERRAIN_SET_INDEX,  # 0
-			true
-		)
-
-# ---------- ВСПОМОГАТЕЛЬНЫЕ ----------
 
 func _set_grid(pos: Vector2i, t: int) -> void:
 	if pos.x < 0 or pos.y < 0 or pos.x >= map_width_tiles or pos.y >= map_height_tiles:
@@ -329,3 +293,48 @@ func _has_neighbor(pos: Vector2i, t: int) -> bool:
 		if _get_grid(n) == t:
 			return true
 	return false
+	
+# ---------- РАСКЛАДКА ПО 3 УРОВНЯМ ----------
+func _apply_grid_to_layers():
+	floor_layer.clear()
+	wall_layer.clear()
+	top_layer.clear()
+	
+	var floor_cells: Array[Vector2i] = []
+	var wall_cells: Array[Vector2i] = []
+	
+	for y in map_height_tiles:
+		for x in map_width_tiles:
+			var pos := Vector2i(x, y)
+			match _get_grid(pos):
+				TileType.FLOOR:
+					floor_cells.append(pos)
+				TileType.WALL:
+					wall_cells.append(pos)
+	
+	# Пол
+	if not floor_cells.is_empty():
+		floor_layer.set_cells_terrain_connect(floor_cells, 0, 1)
+	
+	# Стены снизу
+	if not wall_cells.is_empty():
+		wall_layer.set_cells_terrain_connect(wall_cells, 0, 0)
+	
+	# Бортики сверху стен
+	_build_walltops()
+
+# ========== БОРТИКИ — ГЛАВНАЯ МАГИЯ 3D ==========
+func _build_walltops():
+	var top_cells: Array[Vector2i] = []
+	
+	# Проходим по всем стенам
+	for pos in wall_layer.get_used_cells():
+		var above := pos + Vector2i(0, -1)
+		
+		# Если сверху от стены — НЕ стена (пол или пустота)
+		if wall_layer.get_cell_source_id(above) == -1:
+			top_cells.append(pos)  # бортик в той же клетке!
+	
+	# Автотейлинг бортиков
+	if not top_cells.is_empty():
+		top_layer.set_cells_terrain_connect(top_cells, 0, 2)
