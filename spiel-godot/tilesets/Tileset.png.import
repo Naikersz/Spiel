@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cyncs24gwctyx"
-path="res://.godot/imported/bortik.png-2e84feb963e8e583aaf87e29e5033860.ctex"
+uid="uid://ch8beaasi0tad"
+path="res://.godot/imported/Tileset.png-acdc9f5f7a4d82c86fdb37571f46ccf4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://tilesets/bortik.png"
-dest_files=["res://.godot/imported/bortik.png-2e84feb963e8e583aaf87e29e5033860.ctex"]
+source_file="res://tilesets/Tileset.png"
+dest_files=["res://.godot/imported/Tileset.png-acdc9f5f7a4d82c86fdb37571f46ccf4.ctex"]
 
 [params]
 

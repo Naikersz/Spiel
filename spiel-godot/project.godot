@@ -22,6 +22,8 @@ DevSettings="*res://core/dev_settings.gd"
 
 [display]
 
+window/size/viewport_width=1668
+window/size/viewport_height=940
 window/stretch/mode="viewport"
 
 [importer_defaults]

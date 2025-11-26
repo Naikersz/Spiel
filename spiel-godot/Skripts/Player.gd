@@ -128,7 +128,6 @@ func _unhandled_input(event: InputEvent) -> void:
 				toggle_clothing("cuffs")
 
 func _physics_process(delta: float) -> void:
-	print("PHYS TICK")
 	var input_vector := Vector2.ZERO
 
 	if Input.is_action_pressed("move_right"):
@@ -218,4 +217,3 @@ func _set_animation_on_sprite(sprite: AnimatedSprite2D, anim_name: String, _fall
 	if sprite.sprite_frames.has_animation(anim_name):
 		if sprite.animation != anim_name:
 			sprite.play(anim_name)
-			
