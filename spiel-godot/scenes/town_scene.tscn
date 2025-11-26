@@ -1,6 +1,6 @@
 [gd_scene load_steps=2 format=3 uid="uid://cnb52vwthl1q3"]
 
-[ext_resource type="Script" path="res://scenes/town_scene.gd" id="1_town_scene"]
+[ext_resource type="Script" uid="uid://obol61cdokc2" path="res://scenes/town_scene.gd" id="1_town_scene"]
 
 [node name="TownScene" type="Control"]
 layout_mode = 3
@@ -42,37 +42,36 @@ size_flags_vertical = 3
 theme_override_constants/separation = 20
 
 [node name="InventoryButton" type="Button" parent="VBoxContainer/ButtonContainer"]
+custom_minimum_size = Vector2(220, 60)
 layout_mode = 2
 size_flags_horizontal = 4
-custom_minimum_size = Vector2(220, 60)
 theme_override_font_sizes/font_size = 40
 text = "Inventar"
 
 [node name="SmithButton" type="Button" parent="VBoxContainer/ButtonContainer"]
+custom_minimum_size = Vector2(220, 60)
 layout_mode = 2
 size_flags_horizontal = 4
-custom_minimum_size = Vector2(220, 60)
 theme_override_font_sizes/font_size = 40
 text = "Schmied"
 
 [node name="ShopButton" type="Button" parent="VBoxContainer/ButtonContainer"]
+custom_minimum_size = Vector2(220, 60)
 layout_mode = 2
 size_flags_horizontal = 4
-custom_minimum_size = Vector2(220, 60)
 theme_override_font_sizes/font_size = 40
 text = "Shop"
 
 [node name="FightButton" type="Button" parent="VBoxContainer/ButtonContainer"]
+custom_minimum_size = Vector2(220, 60)
 layout_mode = 2
 size_flags_horizontal = 4
-custom_minimum_size = Vector2(220, 60)
 theme_override_font_sizes/font_size = 40
 text = "Kampf"
 
 [node name="ExitButton" type="Button" parent="VBoxContainer/ButtonContainer"]
+custom_minimum_size = Vector2(220, 60)
 layout_mode = 2
 size_flags_horizontal = 4
-custom_minimum_size = Vector2(220, 60)
 theme_override_font_sizes/font_size = 40
 text = "Spiel beenden"
-

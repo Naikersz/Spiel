@@ -43,6 +43,5 @@ func _on_fight_pressed():
 		print("⚠️ Level Selection-Szene nicht gefunden!")
 
 func _on_exit_pressed():
-	print("⬅ Zurück zum Hauptmenü")
-	var main_menu = preload("res://scenes/main_menu.tscn")
-	get_tree().change_scene_to_packed(main_menu)
+	print("⬅ Zurück zum Hauptmenü aus Town-Szene")
+	get_tree().call_deferred("change_scene_to_file", "res://scenes/main_menu.tscn")

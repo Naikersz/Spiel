@@ -45,6 +45,7 @@ var _bsp_root: BSPNode = null
 func _ready():
 	_rng.randomize()
 	generate_dungeon()
+	_spawn_enemies_in_dungeon()
 
 
 # ---------- ГЛАВНАЯ ----------
@@ -201,6 +202,7 @@ func _connect_rooms_with_corridor(room_a: Rect2i, room_b: Rect2i) -> void:
 		room_a.position.y + room_a.size.y / 2
 	)
 	var center_b := Vector2i(
+		@warning_ignore("integer_division")
 		room_b.position.x + room_b.size.x / 2,
 		room_b.position.y + room_b.size.y / 2
 	)
@@ -341,6 +343,81 @@ func _apply_grid_to_layers():
 
 	# Бортики сверху стен
 	_build_walltops()
+
+
+# ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ СПАВНА (WALKABLE + POS) ==========
+
+func is_walkable_tile(cell: Vector2i) -> bool:
+	return _get_grid(cell) == TileType.FLOOR
+
+
+func cell_to_world(cell: Vector2i) -> Vector2:
+	if floor_layer:
+		return floor_layer.map_to_local(cell)
+	return Vector2.ZERO
+
+
+## Prüft zusätzlich, ob die Kachel wirklich aus dem Dungeon-Tileset/Floor stammt.
+## Standardmäßig filtern wir nach source_id == 0, das ist in deinem Tileset
+## der Haupt-Dungeon-Floor. Falls du später andere Quellen nutzt, kannst du
+## diese Bedingung anpassen.
+func is_dungeon_floor(cell: Vector2i) -> bool:
+	# Vereinfachung: alles, was als FLOOR im internen Grid markiert ist,
+	# zählt als Dungeon-Floor. Falls du später genauer filtern möchtest,
+	# kannst du hier wieder auf get_cell_source_id() prüfen.
+	return is_walkable_tile(cell)
+
+
+# ========== ПРОСТАЯ ГЕНЕРАЦИЯ ПРОТИВНИКОВ В ПОДЗЕМЕЛЬЕ ==========
+
+func _spawn_enemies_in_dungeon(count: int = 5) -> void:
+	# Собираем все клетки пола
+	var floor_cells: Array[Vector2i] = []
+	for y in map_height_tiles:
+		for x in map_width_tiles:
+			var c := Vector2i(x, y)
+			if is_dungeon_floor(c):
+				floor_cells.append(c)
+
+	if floor_cells.is_empty():
+		return
+
+	# Родительский узел для визуальных врагов
+	# Hängen wir an die TopLayer, damit sie sicher über dem Dungeon gerendert werden.
+	var enemies_root := Node2D.new()
+	enemies_root.name = "Enemies"
+	enemies_root.z_index = 1
+	enemies_root.y_sort_enabled = true
+	if top_layer:
+		top_layer.add_child(enemies_root)
+	else:
+		add_child(enemies_root)
+
+	# Случайно расставляем несколько "врагов" как красные квадраты
+	for i in range(count):
+		var idx := _rng.randi_range(0, floor_cells.size() - 1)
+		var cell := floor_cells[idx]
+		var world_pos := cell_to_world(cell)
+
+		var enemy := Node2D.new()
+		enemy.name = "Enemy_%d" % i
+		enemy.position = world_pos
+		enemy.z_index = 5
+		enemies_root.add_child(enemy)
+
+		# Roter Punkt (Körper)
+		var marker := ColorRect.new()
+		marker.color = Color(1, 0, 0, 0.9)
+		marker.size = Vector2(10, 10)
+		marker.position = Vector2(-5, -5)
+		enemy.add_child(marker)
+
+		# Grüner HP-Balken darüber
+		var hp_bar := ColorRect.new()
+		hp_bar.color = Color(0, 1, 0, 0.9)
+		hp_bar.size = Vector2(14, 3)
+		hp_bar.position = Vector2(-7, -9)
+		enemy.add_child(hp_bar)
 
 # ========== БОРТИКИ — ГЛАВНАЯ МАГИЯ 3D ==========
 func _build_walltops():

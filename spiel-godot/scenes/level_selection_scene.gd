@@ -50,12 +50,10 @@ func start_battle(level_type: String, level_number: int):
 	# Level-Informationen in Constants speichern
 	Constants.current_level_type = level_type
 	Constants.current_level_number = level_number
-	
-	var battle_scene = preload("res://scenes/battle_scene.tscn")
-	if battle_scene:
-		get_tree().change_scene_to_packed(battle_scene)
-	else:
-		print("⚠️ Battle-Szene nicht gefunden!")
+
+	# Statt der alten Battle-Szene die Dungeon-Hauptszene laden,
+	# die den Generator + LevelTown + Player instanziert.
+	get_tree().call_deferred("change_scene_to_file", "res://main.tscn")
 
 func _on_back_pressed():
 	print("Zurück-Button gedrückt (Level Selection)")

@@ -1,9 +1,11 @@
-[gd_scene load_steps=3 format=4 uid="uid://c1disblkk0wqf"]
+[gd_scene load_steps=4 format=4 uid="uid://c1disblkk0wqf"]
 
 [ext_resource type="TileSet" uid="uid://cpm4a38t1csby" path="res://tilesets/Tilesett.tres" id="1_0ji00"]
 [ext_resource type="TileSet" uid="uid://ck4pg483b1kns" path="res://Tilesett.tres" id="2_sgabc"]
+[ext_resource type="Script" path="res://Skripts/normal_room_enemy_spawner.gd" id="3_spawner"]
 
 [node name="NormalRoom1" type="Node2D"]
+script = ExtResource("3_spawner")
 scale = Vector2(0.671093, 1.2358413)
 
 [node name="TileMap" type="TileMap" parent="."]
