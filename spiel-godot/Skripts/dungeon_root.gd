@@ -7,13 +7,25 @@ extends Node2D
 @export var max_room_size: int = 12
 @export var max_depth: int = 8
 
+# Направления для удобной проверки соседей
+const N  := Vector2i(0, -1)
+const S  := Vector2i(0,  1)
+const W  := Vector2i(-1, 0)
+const E  := Vector2i(1,  0)
+const NW := Vector2i(-1, -1)
+const NE := Vector2i(1, -1)
+const SW := Vector2i(-1,  1)
+const SE := Vector2i(1,  1)
+
 # ========== ССЫЛКИ НА TileMapLayer (ВАЖНО: НЕ TileMap!) ==========
 @onready var floor_layer: TileMapLayer = $TileMapFloor/FloorLayer
 @onready var wall_layer: TileMapLayer = $TileMapFloor/WallLayer
+@onready var wall_volume_layer: TileMapLayer = $TileMapFloor/ColumnsLayer
 @onready var top_layer: TileMapLayer = $TileMapFloor/TopLayer  
 
 # ========== ВНУТРЕННЯЯ КАРТА ==========
 enum TileType { EMPTY, FLOOR, WALL }
+enum CornerType { NONE, UL, UR, DL, DR }
 var _grid: Array = []
 var _rng := RandomNumberGenerator.new()
 
@@ -298,11 +310,12 @@ func _has_neighbor(pos: Vector2i, t: int) -> bool:
 func _apply_grid_to_layers():
 	floor_layer.clear()
 	wall_layer.clear()
+	wall_volume_layer.clear()
 	top_layer.clear()
-	
+
 	var floor_cells: Array[Vector2i] = []
 	var wall_cells: Array[Vector2i] = []
-	
+
 	for y in map_height_tiles:
 		for x in map_width_tiles:
 			var pos := Vector2i(x, y)
@@ -315,11 +328,17 @@ func _apply_grid_to_layers():
 	# Пол
 	if not floor_cells.is_empty():
 		floor_layer.set_cells_terrain_connect(floor_cells, 0, 1)
-	
+
 	# Стены снизу
 	if not wall_cells.is_empty():
 		wall_layer.set_cells_terrain_connect(wall_cells, 0, 0)
-	
+
+	# Объемные фасады
+	_build_wall_volume()
+
+	# Колонны в углах стен (тест‑версия: один тип колонн)
+	_build_pillars()
+
 	# Бортики сверху стен
 	_build_walltops()
 
@@ -338,3 +357,104 @@ func _build_walltops():
 	# Автотейлинг бортиков
 	if not top_cells.is_empty():
 		top_layer.set_cells_terrain_connect(top_cells, 0, 2)
+
+func _build_wall_volume():
+	var facade_cells: Array[Vector2i] = []
+
+	# Собираем только те стены, которые находятся над полом (объёмные фасады)
+	for pos in wall_layer.get_used_cells():
+		var below := pos + Vector2i(0, 1)
+		if _get_grid(below) == TileType.FLOOR:
+			facade_cells.append(pos)
+
+	# Используем terrain set для объёмных фасадов (source_id=0, terrain_set=0, terrain=0)
+	if not facade_cells.is_empty():
+		wall_volume_layer.set_cells_terrain_connect(facade_cells, 0, 0)
+
+
+# ---------- КОЛОННЫ В УГЛАХ СТЕН ----------
+# Используем wall_volume_layer как слой колонн (источник tileset с колоннами).
+# В tileset есть источник 1 с колонной:
+#  - верхняя часть: atlas (11, 0), alternative 1
+#  - нижняя часть: atlas (11, 1), alternative 1
+#
+# В тест‑версии ставим ОДИН тип колонн во все типы внутренних углов.
+func _build_pillars() -> void:
+	# На всякий случай очищаем слой колонн
+	wall_volume_layer.clear()
+
+	# Берём прямоугольник, в котором реально есть стены
+	var used: Rect2i = wall_layer.get_used_rect()
+
+	# Чуть расширим, чтобы захватить клетки пола/пустоты вокруг
+	used.position -= Vector2i(1, 1)
+	used.size     += Vector2i(2, 2)
+
+	for x in range(used.position.x, used.position.x + used.size.x):
+		for y in range(used.position.y, used.position.y + used.size.y):
+			var p := Vector2i(x, y)
+			var corner := detect_outer_corner(p)
+
+			match corner:
+				CornerType.UL, CornerType.UR, CornerType.DL, CornerType.DR:
+					# Тест‑версия: используем один и тот же тип колонны
+					_place_column(p)
+				CornerType.NONE:
+					pass
+
+
+func is_wall(p: Vector2i) -> bool:
+	return _get_grid(p) == TileType.WALL
+
+
+func detect_outer_corner(p: Vector2i) -> CornerType:
+	# сама клетка должна быть НЕ стеной (пол/пусто)
+	if is_wall(p):
+		return CornerType.NONE
+
+	var up    := is_wall(p + Vector2i(0, -1))
+	var down  := is_wall(p + Vector2i(0, 1))
+	var left  := is_wall(p + Vector2i(-1, 0))
+	var right := is_wall(p + Vector2i(1, 0))
+
+	var ul := is_wall(p + Vector2i(-1, -1))
+	var ur := is_wall(p + Vector2i(1, -1))
+	var dl := is_wall(p + Vector2i(-1, 1))
+	var dr := is_wall(p + Vector2i(1, 1))
+
+	# верхний левый угол комнаты
+	if up and left and ul and not down:
+		return CornerType.UL
+
+	# верхний-правый
+	if up and right and ur and not down:
+		return CornerType.UR
+
+	# нижний-левый
+	if down and left and dl and not up:
+		return CornerType.DL
+
+	# нижний-правый
+	if down and right and dr and not up:
+		return CornerType.DR
+
+	return CornerType.NONE
+
+
+func _place_column(cell: Vector2i) -> void:
+	# Нижняя часть колонны
+	wall_volume_layer.set_cell(
+		cell,
+		1,                # source_id с колонной
+		Vector2i(11, 1),  # нижняя часть
+		1                 # alternative
+	)
+
+	# Верхняя часть колонны — тайл выше
+	var top_cell := cell + Vector2i(0, -1)
+	wall_volume_layer.set_cell(
+		top_cell,
+		1,                # тот же источник
+		Vector2i(11, 0),  # верхняя часть
+		1                 # alternative
+	)

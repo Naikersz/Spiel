@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://d01crt7khikj3"
-path="res://.godot/imported/Terrain (32x32)-Sheet-export.png-c0674f5674f3f2da0432a4255a02fc47.ctex"
+uid="uid://de855gmwemq7n"
+path="res://.godot/imported/wall_volume_autotile.png-11ebd68f01e5faf88809f0dd0723f0b8.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://tilesets/Terrain (32x32)-Sheet-export.png"
-dest_files=["res://.godot/imported/Terrain (32x32)-Sheet-export.png-c0674f5674f3f2da0432a4255a02fc47.ctex"]
+source_file="res://tilesets/wall_volume_autotile.png"
+dest_files=["res://.godot/imported/wall_volume_autotile.png-11ebd68f01e5faf88809f0dd0723f0b8.ctex"]
 
 [params]
 
