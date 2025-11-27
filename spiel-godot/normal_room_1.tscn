@@ -23,3 +23,223 @@ collision_enabled = false
 position = Vector2(187.61156, -206.13939)
 rotation = 3.1415927
 scale = Vector2(1.8504426, 1.8723472)
+
+[node name="CanvasLayer" type="CanvasLayer" parent="."]
+
+[node name="DevToggleButton" type="Button" parent="CanvasLayer"]
+layout_mode = 0
+anchor_left = 1.0
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.0
+offset_left = -120.0
+offset_top = 10.0
+offset_right = -10.0
+offset_bottom = 40.0
+text = "Dev"
+
+[node name="LevelLabel" type="Label" parent="CanvasLayer"]
+layout_mode = 0
+anchor_left = 0.5
+anchor_top = 0.0
+anchor_right = 0.5
+anchor_bottom = 0.0
+offset_left = -150.0
+offset_top = 10.0
+offset_right = 150.0
+offset_bottom = 40.0
+horizontal_alignment = 1
+text = "Level 1"
+
+[node name="EnemyInfoLabel" type="RichTextLabel" parent="CanvasLayer"]
+layout_mode = 0
+anchor_left = 0.0
+anchor_top = 0.0
+anchor_right = 0.4
+anchor_bottom = 0.4
+offset_left = 10.0
+offset_top = 50.0
+offset_right = 310.0
+offset_bottom = 250.0
+bbcode_enabled = true
+visible = false
+
+[node name="WinOverlay" type="Control" parent="CanvasLayer"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="CanvasLayer/WinOverlay"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.3
+anchor_top = 0.3
+anchor_right = 0.7
+anchor_bottom = 0.7
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/WinOverlay/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 16
+
+[node name="TitleLabel" type="Label" parent="CanvasLayer/WinOverlay/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 20
+text = "Alle Gegner besiegt!"
+horizontal_alignment = 1
+
+[node name="InfoLabel" type="Label" parent="CanvasLayer/WinOverlay/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Möchtest du dieses Level erneut spielen oder zur nächsten Ebene gehen?"
+horizontal_alignment = 1
+autowrap_mode = 2
+
+[node name="Buttons" type="HBoxContainer" parent="CanvasLayer/WinOverlay/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 20
+
+[node name="RetryButton" type="Button" parent="CanvasLayer/WinOverlay/Panel/VBoxContainer/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Nochmal spielen"
+
+[node name="NextButton" type="Button" parent="CanvasLayer/WinOverlay/Panel/VBoxContainer/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Nächste Ebene"
+
+[node name="ExitButton" type="Button" parent="CanvasLayer/WinOverlay/Panel/VBoxContainer/Buttons"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "Zurück zur Stadt"
+
+[node name="DevOverlay" type="Control" parent="CanvasLayer"]
+visible = false
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="Panel" parent="CanvasLayer/DevOverlay"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.6
+anchor_top = 0.0
+anchor_right = 1.0
+anchor_bottom = 0.4
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="CanvasLayer/DevOverlay/Panel"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 10
+
+[node name="TitleLabel" type="Label" parent="CanvasLayer/DevOverlay/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 18
+text = "Dev-Tools (NormalRoom1)"
+
+[node name="EnemyCountLabel" type="Label" parent="CanvasLayer/DevOverlay/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Normale: 0"
+
+[node name="HBoxButtons" type="HBoxContainer" parent="CanvasLayer/DevOverlay/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="MinusButton" type="Button" parent="CanvasLayer/DevOverlay/Panel/VBoxContainer/HBoxButtons"]
+layout_mode = 2
+text = "-1"
+
+[node name="PlusButton" type="Button" parent="CanvasLayer/DevOverlay/Panel/VBoxContainer/HBoxButtons"]
+layout_mode = 2
+text = "+1"
+
+[node name="MagicLabel" type="Label" parent="CanvasLayer/DevOverlay/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Magische: 0"
+
+[node name="MagicButtons" type="HBoxContainer" parent="CanvasLayer/DevOverlay/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="MagicMinusButton" type="Button" parent="CanvasLayer/DevOverlay/Panel/VBoxContainer/MagicButtons"]
+layout_mode = 2
+text = "-1"
+
+[node name="MagicPlusButton" type="Button" parent="CanvasLayer/DevOverlay/Panel/VBoxContainer/MagicButtons"]
+layout_mode = 2
+text = "+1"
+
+[node name="EpicLabel" type="Label" parent="CanvasLayer/DevOverlay/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Epische: 0"
+
+[node name="EpicButtons" type="HBoxContainer" parent="CanvasLayer/DevOverlay/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="EpicMinusButton" type="Button" parent="CanvasLayer/DevOverlay/Panel/VBoxContainer/EpicButtons"]
+layout_mode = 2
+text = "-1"
+
+[node name="EpicPlusButton" type="Button" parent="CanvasLayer/DevOverlay/Panel/VBoxContainer/EpicButtons"]
+layout_mode = 2
+text = "+1"
+
+[node name="LevelMinLabel" type="Label" parent="CanvasLayer/DevOverlay/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Level-Minimum: 1"
+
+[node name="LevelMinButtons" type="HBoxContainer" parent="CanvasLayer/DevOverlay/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="LevelMinMinusButton" type="Button" parent="CanvasLayer/DevOverlay/Panel/VBoxContainer/LevelMinButtons"]
+layout_mode = 2
+text = "-1"
+
+[node name="LevelMinPlusButton" type="Button" parent="CanvasLayer/DevOverlay/Panel/VBoxContainer/LevelMinButtons"]
+layout_mode = 2
+text = "+1"
+
+[node name="LevelMaxLabel" type="Label" parent="CanvasLayer/DevOverlay/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Level-Maximum: 10"
+
+[node name="LevelMaxButtons" type="HBoxContainer" parent="CanvasLayer/DevOverlay/Panel/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="LevelMaxMinusButton" type="Button" parent="CanvasLayer/DevOverlay/Panel/VBoxContainer/LevelMaxButtons"]
+layout_mode = 2
+text = "-1"
+
+[node name="LevelMaxPlusButton" type="Button" parent="CanvasLayer/DevOverlay/Panel/VBoxContainer/LevelMaxButtons"]
+layout_mode = 2
+text = "+1"
+
+[node name="ApplyButton" type="Button" parent="CanvasLayer/DevOverlay/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Neu generieren"
+
+[node name="CloseButton" type="Button" parent="CanvasLayer/DevOverlay/Panel/VBoxContainer"]
+layout_mode = 2
+text = "Schließen"

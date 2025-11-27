@@ -125,4 +125,3 @@ func _on_new_game(slot_index: int):
 func _on_back_pressed():
 	print("Zurück-Button gedrückt (Load Menu)")
 	get_tree().call_deferred("change_scene_to_file", "res://scenes/main_menu.tscn")
-
