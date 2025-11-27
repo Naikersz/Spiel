@@ -70,7 +70,6 @@ var slot_buttons: Dictionary = {}  # slot_name -> Button
 var inventory_buttons: Array = []  # Array von Buttons
 var hovered_item: Dictionary = {}  # Aktuell gehovertes Item
 var hovered_slot: String = ""      # Aktuell gehoverter Slot
-var total_stats: Dictionary = {}   # Vollständig berechnete Basis-Stats
 
 func _ready():
 	slot_index = Constants.current_slot_index
@@ -104,25 +103,10 @@ func load_data():
 			file.close()
 			var json_obj = JSON.new()
 			if json_obj.parse(json_string) == OK:
-				var raw_data = json_obj.data
-				if raw_data is Dictionary:
-					player_data = raw_data
-					player_name = player_data.get("name", "Unbekannt")
-					player_level = player_data.get("level", player_data.get("stats", {}).get("level", 1))
-					var raw_equipped = player_data.get("equipped", {})
-					if raw_equipped is Dictionary:
-						equipped_items = raw_equipped
-					else:
-						equipped_items = {}
-
-					# Vollständig berechnete Stats aus player.json (falls vorhanden)
-					var raw_total = player_data.get("total_stats", {})
-					if raw_total is Dictionary:
-						total_stats = raw_total
-					else:
-						total_stats = {}
-				else:
-					error_message = "Spielerdatei hat ein unerwartetes Format."
+				player_data = json_obj.data
+				player_name = player_data.get("name", "Unbekannt")
+				player_level = player_data.get("level", player_data.get("stats", {}).get("level", 1))
+				equipped_items = player_data.get("equipped", {})
 			else:
 				error_message = "Spielerdatei ist beschädigt."
 		else:
@@ -204,31 +188,6 @@ func update_display():
 		error_label.visible = true
 	else:
 		error_label.visible = false
-
-	# Zeige zusammengefasste Basis-Stats, falls vorhanden
-	if not total_stats.is_empty():
-		var sb := "[b]Gesamt-Stats:[/b]\n"
-		sb += "Leben: %d / %d\n" % [
-			int(total_stats.get("health", total_stats.get("max_health", 0))),
-			int(total_stats.get("max_health", 0))
-		]
-		sb += "Schaden: %d\n" % int(total_stats.get("damage", 0))
-		sb += "Verteidigung: %d\n" % int(total_stats.get("defense", 0))
-		sb += "Mag. Verteidigung: %d\n" % int(total_stats.get("magic_defense", 0))
-		sb += "Rüstung: %d\n" % int(total_stats.get("armour", 0))
-		sb += "Ausweichen: %d\n" % int(total_stats.get("evasion", 0))
-		sb += "Energie-Schild: %d\n" % int(total_stats.get("energy_shield", 0))
-		sb += "Blockchance: %d\n" % int(total_stats.get("block_chance", 0))
-		sb += "Angriffsgeschw.: %.2f\n" % float(total_stats.get("attack_speed", 1.0))
-		sb += "Bewegungsgeschw.: %d\n" % int(total_stats.get("movement_speed", 0))
-		sb += "\nAttribute:\n"
-		sb += "Stärke: %d\n" % int(total_stats.get("strength", 0))
-		sb += "Intelligenz: %d\n" % int(total_stats.get("intelligence", 0))
-		sb += "Geschicklichkeit: %d\n" % int(total_stats.get("dexterity", 0))
-		sb += "Geschwindigkeit: %d\n" % int(total_stats.get("speed", 0))
-		info_label.text = sb
-	else:
-		info_label.text = info_message
 	
 	update_equipped_display()
 	update_inventory_display()
@@ -299,8 +258,8 @@ func _on_inventory_item_selected(index: int):
 	selected_equipped_slot = ""
 	if index < inventory_items.size():
 		var item = inventory_items[index]
-		var item_name = item.get("name", item.get("id", "Item"))
-		info_message = "Inventar-Item '%s' ausgewählt." % item_name
+		var name = item.get("name", item.get("id", "Item"))
+		info_message = "Inventar-Item '%s' ausgewählt." % name
 		info_label.text = info_message
 	update_equipped_display()
 	update_inventory_display()
@@ -332,8 +291,8 @@ func _show_tooltip(item: Dictionary):
 	if item.is_empty():
 		return
 	
-	var tooltip_text_local = _format_item_tooltip(item)
-	tooltip_label.text = tooltip_text_local
+	var tooltip_text = _format_item_tooltip(item)
+	tooltip_label.text = tooltip_text
 	tooltip_panel.visible = true
 
 func _hide_tooltip():
@@ -343,64 +302,38 @@ func _format_item_tooltip(item: Dictionary) -> String:
 	if item.is_empty():
 		return ""
 	
-	var base_text = "[b]%s[/b]\n" % item.get("name", item.get("id", "Unbekannt"))
-	base_text += "Level: %s\n" % str(item.get("item_level", "?"))
-	base_text += "Typ: %s\n" % item.get("item_type", "?")
-
-	# Stats des Hover-Items
-	var stats: Dictionary = item.get("stats", {})
+	var text = "[b]%s[/b]\n" % item.get("name", item.get("id", "Unbekannt"))
+	text += "Level: %s\n" % str(item.get("item_level", "?"))
+	text += "Typ: %s\n" % item.get("item_type", "?")
+	
+	# Stats
+	var stats = item.get("stats", {})
 	if not stats.is_empty():
-		base_text += "\n[b]Stats:[/b]\n"
+		text += "\n[b]Stats:[/b]\n"
 		for stat_name in stats.keys():
 			var value = stats[stat_name]
 			if value != 0:
-				base_text += "%s: %s\n" % [stat_name.capitalize(), str(value)]
-
-	# Vergleich mit ausgerüstetem Item (falls vorhanden und Slot eindeutig bestimmbar)
-	var slot_name := ""
-	if item.has("item_type"):
-		var item_type: String = String(item.get("item_type", ""))
-		slot_name = SLOT_MAP.get(item_type, "")
-
-	if slot_name != "" and equipped_items.has(slot_name):
-		var equipped_item = equipped_items.get(slot_name)
-		if equipped_item is Dictionary and not (equipped_item as Dictionary).is_empty():
-			var eq_stats: Dictionary = (equipped_item as Dictionary).get("stats", {})
-			if not eq_stats.is_empty():
-				base_text += "\n[b]Vergleich mit ausgerüstetem %s:[/b]\n" % SLOT_NAMES_DE.get(slot_name, slot_name.capitalize())
-				for stat_name in stats.keys():
-					var new_val = int(stats.get(stat_name, 0))
-					var old_val = int(eq_stats.get(stat_name, 0))
-					if new_val == 0 and old_val == 0:
-						continue
-					var diff = new_val - old_val
-					var line = "%s: %d (aktuell: %d" % [stat_name.capitalize(), new_val, old_val]
-					if diff > 0:
-						line += ", [color=green]+%d[/color]" % diff
-					elif diff < 0:
-						line += ", [color=red]%d[/color]" % diff
-					line += ")\n"
-					base_text += line
-
+				text += "%s: %s\n" % [stat_name.capitalize(), str(value)]
+	
 	# Requirements
 	var requirements = item.get("requirements", {})
 	if not requirements.is_empty():
-		base_text += "\n[b]Anforderungen:[/b]\n"
+		text += "\n[b]Anforderungen:[/b]\n"
 		for req_name in requirements.keys():
 			var value = requirements[req_name]
 			if value != 0:
-				base_text += "%s: %s\n" % [req_name.capitalize(), str(value)]
-
+				text += "%s: %s\n" % [req_name.capitalize(), str(value)]
+	
 	# Enchantments
 	var enchantments = item.get("enchantments", [])
 	if not enchantments.is_empty():
-		base_text += "\n[b]Verzauberungen:[/b]\n"
+		text += "\n[b]Verzauberungen:[/b]\n"
 		for enchant in enchantments:
 			var enchant_name = enchant.get("name", "?")
 			var enchant_value = enchant.get("value", 0)
-			base_text += "%s: +%s\n" % [enchant_name, str(enchant_value)]
-
-	return base_text
+			text += "%s: +%s\n" % [enchant_name, str(enchant_value)]
+	
+	return text
 
 func _process(_delta):
 	if tooltip_panel.visible:
@@ -439,8 +372,8 @@ func _on_equip_pressed():
 	
 	selected_inventory_index = -1
 	persist_changes()
-	var equipped_name = item.get("name", item.get("id", "Item"))
-	info_message = "%s wurde ausgerüstet." % equipped_name
+	var name = item.get("name", item.get("id", "Item"))
+	info_message = "%s wurde ausgerüstet." % name
 	info_label.text = info_message
 	update_display()
 
@@ -459,8 +392,8 @@ func _on_unequip_pressed():
 	inventory_items.append(item)
 	equipped_items[selected_equipped_slot] = null
 	persist_changes()
-	var unequipped_name = item.get("name", item.get("id", "Item"))
-	info_message = "%s abgelegt." % unequipped_name
+	var name = item.get("name", item.get("id", "Item"))
+	info_message = "%s abgelegt." % name
 	info_label.text = info_message
 	selected_equipped_slot = ""
 	update_display()
@@ -485,16 +418,16 @@ func persist_changes():
 	# Player speichern
 	if not player_data.is_empty():
 		player_data["equipped"] = equipped_items
-		var player_file = FileAccess.open(player_path, FileAccess.WRITE)
-		if player_file:
-			player_file.store_string(JSON.stringify(player_data, "\t"))
-			player_file.close()
+		var file = FileAccess.open(player_path, FileAccess.WRITE)
+		if file:
+			file.store_string(JSON.stringify(player_data, "\t"))
+			file.close()
 	
 	# Inventar speichern
-	var inv_file = FileAccess.open(inventory_path, FileAccess.WRITE)
-	if inv_file:
-		inv_file.store_string(JSON.stringify(inventory_items, "\t"))
-		inv_file.close()
+	var file = FileAccess.open(inventory_path, FileAccess.WRITE)
+	if file:
+		file.store_string(JSON.stringify(inventory_items, "\t"))
+		file.close()
 
 func resolve_slot(item_type: String) -> String:
 	if item_type.is_empty():

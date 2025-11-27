@@ -1,7 +1,7 @@
 [gd_scene load_steps=7 format=3 uid="uid://c5gbg6mhe6oic"]
 
-[ext_resource type="Texture2D" uid="uid://cyal686cvg71b" path="res://Theme.jpg" id="1_06t4h"]
-[ext_resource type="Theme" uid="uid://ddqvm87w4sqiw" path="res://new_theme.tres" id="1_7vrkn"]
+[ext_resource type="Texture2D" uid="uid://s0kvt2j7k8qe" path="res://images/Theme.jpg" id="1_06t4h"]
+[ext_resource type="Theme" path="res://new_theme.tres" id="1_7vrkn"]
 [ext_resource type="Theme" uid="uid://2k6kd1w35uyf" path="res://fonts/GameName.tres" id="3_wu84c"]
 [ext_resource type="Theme" uid="uid://o6jbus45psrn" path="res://fonts/new_theme.tres" id="4_wu84c"]
 

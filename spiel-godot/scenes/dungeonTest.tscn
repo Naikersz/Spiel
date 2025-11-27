@@ -1,24 +1,15 @@
-[gd_scene load_steps=18 format=3 uid="uid://5er5e01nuvyd"]
+[gd_scene load_steps=13 format=3 uid="uid://dgerasvleqhop"]
 
-[ext_resource type="PackedScene" uid="uid://c5l0aej3cgpyr" path="res://scenes/level_town.tscn" id="1_d2wvv"]
-[ext_resource type="Script" uid="uid://xqdehdhsl7s0" path="res://scenes/level_town.gd" id="2_3v2ag"]
-[ext_resource type="Theme" uid="uid://o6jbus45psrn" path="res://fonts/new_theme.tres" id="3_jej6c"]
-[ext_resource type="Texture2D" uid="uid://s0kvt2j7k8qe" path="res://images/Theme.jpg" id="4_f1ej7"]
-[ext_resource type="Shader" uid="uid://bmjhur8bs7mo1" path="res://main.gdshader" id="5_oprun"]
-[ext_resource type="TileSet" uid="uid://ck4pg483b1kns" path="res://Tilesett.tres" id="6_a8ls1"]
-[ext_resource type="Texture2D" uid="uid://52pls8pkm0e1" path="res://tilesets/Terrain (32x32).png" id="7_qfm1y"]
-[ext_resource type="Texture2D" uid="uid://ch8beaasi0tad" path="res://tilesets/Tileset.png" id="8_fulsm"]
-[ext_resource type="Texture2D" uid="uid://pud2pr8nid16" path="res://tilesets/pfld.png" id="9_4r5pv"]
-[ext_resource type="Script" uid="uid://3ty4nkd2ujvq" path="res://tools/testloader.gd" id="10_60mlk"]
-[ext_resource type="PackedScene" uid="uid://c6dnqbkblork1" path="res://scenes/player.tscn" id="11_i4ail"]
-
-[sub_resource type="ShaderMaterial" id="ShaderMaterial_cegan"]
-shader = ExtResource("5_oprun")
-shader_parameter/fog_strength = 1.2
-shader_parameter/fog_color = Vector3(0, 0, 0)
+[ext_resource type="Script" uid="uid://bv0hk5invoswk" path="res://Skripts/dungeon_root.gd" id="1_c1dnd"]
+[ext_resource type="TileSet" uid="uid://ck4pg483b1kns" path="res://Tilesett.tres" id="2_0srfo"]
+[ext_resource type="Texture2D" uid="uid://52pls8pkm0e1" path="res://tilesets/Terrain (32x32).png" id="3_1fl6c"]
+[ext_resource type="Texture2D" uid="uid://ch8beaasi0tad" path="res://tilesets/Tileset.png" id="4_ob6xo"]
+[ext_resource type="Texture2D" uid="uid://pud2pr8nid16" path="res://tilesets/pfld.png" id="5_0v6qw"]
+[ext_resource type="Script" uid="uid://3ty4nkd2ujvq" path="res://tools/testloader.gd" id="6_h1ur2"]
+[ext_resource type="PackedScene" uid="uid://c1disblkk0wqf" path="res://scenes/normal_room_1.tscn" id="7_ni7hv"]
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1u8w0"]
-texture = ExtResource("7_qfm1y")
+texture = ExtResource("3_1fl6c")
 texture_region_size = Vector2i(32, 32)
 2:2/0 = 0
 2:2/0/terrain_set = 0
@@ -963,7 +954,7 @@ texture_region_size = Vector2i(32, 32)
 13:11/0/terrains_peering_bit/top_side = 1
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_0odxb"]
-texture = ExtResource("8_fulsm")
+texture = ExtResource("4_ob6xo")
 margins = Vector2i(12, 0)
 texture_region_size = Vector2i(32, 33)
 0:0/0 = 0
@@ -1166,7 +1157,7 @@ texture_region_size = Vector2i(32, 33)
 12:13/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_lswn8"]
-texture = ExtResource("9_4r5pv")
+texture = ExtResource("5_0v6qw")
 texture_region_size = Vector2i(32, 32)
 1:0/0 = 0
 0:3/0 = 0
@@ -1429,7 +1420,7 @@ texture_region_size = Vector2i(32, 32)
 18:10/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_a6jrf"]
-texture = ExtResource("7_qfm1y")
+texture = ExtResource("3_1fl6c")
 texture_region_size = Vector2i(32, 32)
 1:1/0 = 0
 1:1/0/terrain_set = 0
@@ -1978,102 +1969,36 @@ sources/9 = SubResource("TileSetAtlasSource_a6jrf")
 sources/1 = SubResource("TileSetAtlasSource_0odxb")
 sources/2 = SubResource("TileSetAtlasSource_lswn8")
 
-[node name="main" type="Node2D"]
-
-[node name="LevelTown" parent="." instance=ExtResource("1_d2wvv")]
-script = ExtResource("2_3v2ag")
-
-[node name="Camera2D" type="Camera2D" parent="LevelTown"]
-
-[node name="CanvasLayer" type="CanvasLayer" parent="LevelTown/Camera2D"]
-
-[node name="UI" type="Control" parent="LevelTown/Camera2D/CanvasLayer"]
-layout_mode = 3
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-theme = ExtResource("3_jej6c")
-
-[node name="TextureRect" type="TextureRect" parent="LevelTown/Camera2D/CanvasLayer/UI"]
-layout_mode = 1
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-grow_horizontal = 2
-grow_vertical = 2
-texture = ExtResource("4_f1ej7")
-stretch_mode = 6
-
-[node name="HPBar" type="ProgressBar" parent="LevelTown/Camera2D/CanvasLayer/UI"]
-layout_mode = 0
-offset_right = 4.0
-offset_bottom = 27.0
-
-[node name="RotateButton" type="Button" parent="LevelTown/Camera2D/CanvasLayer/UI"]
-layout_mode = 0
-offset_right = 8.0
-offset_bottom = 8.0
-
-[node name="Player" parent="LevelTown" instance=ExtResource("11_i4ail")]
-
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
-
-[node name="ColorRect" type="ColorRect" parent="CanvasLayer"]
-z_index = 10
-material = SubResource("ShaderMaterial_cegan")
-anchors_preset = 15
-anchor_right = 1.0
-anchor_bottom = 1.0
-offset_left = 1459.0
-offset_top = -1367.0
-offset_right = 1480.0
-offset_bottom = -1274.0
-grow_horizontal = 2
-grow_vertical = 2
-mouse_filter = 2
-color = Color(0.003921569, 0.003921569, 0.003921569, 0.003921569)
-
-[node name="DungeonRoot" type="Node2D" parent="."]
+[node name="DungeonRoot" type="Node2D"]
 y_sort_enabled = true
+script = ExtResource("1_c1dnd")
 
-[node name="TileMapFloor" type="TileMap" parent="DungeonRoot"]
+[node name="TileMapFloor" type="TileMap" parent="."]
 y_sort_enabled = true
-tile_set = ExtResource("6_a8ls1")
+tile_set = ExtResource("2_0srfo")
 format = 2
 
-[node name="FloorLayer" type="TileMapLayer" parent="DungeonRoot/TileMapFloor"]
-tile_set = ExtResource("6_a8ls1")
+[node name="FloorLayer" type="TileMapLayer" parent="TileMapFloor"]
+tile_set = ExtResource("2_0srfo")
 
-[node name="WallLayer" type="TileMapLayer" parent="DungeonRoot/TileMapFloor"]
+[node name="WallLayer" type="TileMapLayer" parent="TileMapFloor"]
 z_index = 1
-tile_set = ExtResource("6_a8ls1")
+tile_set = ExtResource("2_0srfo")
 
-[node name="ColumnsLayer" type="TileMapLayer" parent="DungeonRoot/TileMapFloor"]
+[node name="ColumnsLayer" type="TileMapLayer" parent="TileMapFloor"]
 z_index = 2
 y_sort_enabled = true
 tile_set = SubResource("TileSet_xuqvo")
 y_sort_origin = -32
 
-[node name="TopLayer" type="TileMapLayer" parent="DungeonRoot/TileMapFloor"]
+[node name="TopLayer" type="TileMapLayer" parent="TileMapFloor"]
 y_sort_enabled = true
-tile_set = ExtResource("6_a8ls1")
+tile_set = ExtResource("2_0srfo")
 y_sort_origin = 8
 
-[node name="TestRunner" type="Node2D" parent="DungeonRoot/TileMapFloor/TopLayer"]
+[node name="TestRunner" type="Node2D" parent="TileMapFloor/TopLayer"]
 scale = Vector2(0.671093, 1.2358413)
-script = ExtResource("10_60mlk")
+script = ExtResource("6_h1ur2")
 
-[node name="NormalRoom1" parent="DungeonRoot/TileMapFloor/TopLayer/TestRunner"]
-_import_path = NodePath("")
-unique_name_in_owner = false
-process_mode = 0
-process_priority = 0
-process_physics_priority = 0
-process_thread_group = 0
-physics_interpolation_mode = 0
-auto_translate_mode = 0
-editor_description = ""
+[node name="NormalRoom1" parent="TileMapFloor/TopLayer/TestRunner" instance=ExtResource("7_ni7hv")]
 scale = Vector2(1, 1)
-script = null

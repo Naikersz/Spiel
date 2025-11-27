@@ -4,7 +4,6 @@ extends Node
 ## Entspricht game.aw/core/dev_settings.py
 
 var dev_mode: bool = false
-var dev_overlay_visible: bool = false
 var enemy_count: int = 5
 var enchantment_min: int = 0
 var enchantment_max: int = 0
@@ -16,7 +15,6 @@ var enemy_epic_count: int = 0
 func get_settings() -> Dictionary:
 	return {
 		"dev_mode": dev_mode,
-		"dev_overlay_visible": dev_overlay_visible,
 		"enemy_count": enemy_count,
 		"enemy_magic_count": enemy_magic_count,
 		"enemy_epic_count": enemy_epic_count,
@@ -29,8 +27,6 @@ func get_settings() -> Dictionary:
 func set_settings(settings: Dictionary):
 	if settings.has("dev_mode"):
 		dev_mode = settings["dev_mode"]
-	if settings.has("dev_overlay_visible"):
-		dev_overlay_visible = settings["dev_overlay_visible"]
 	if settings.has("enemy_count"):
 		enemy_count = settings["enemy_count"]
 	if settings.has("enemy_magic_count"):
@@ -48,6 +44,4 @@ func set_settings(settings: Dictionary):
 
 func set_dev_mode(enabled: bool):
 	dev_mode = enabled
-	if not enabled:
-		dev_overlay_visible = false
 

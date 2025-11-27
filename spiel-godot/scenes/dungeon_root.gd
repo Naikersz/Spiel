@@ -202,6 +202,7 @@ func _connect_rooms_with_corridor(room_a: Rect2i, room_b: Rect2i) -> void:
 		room_a.position.y + room_a.size.y / 2
 	)
 	var center_b := Vector2i(
+		@warning_ignore("integer_division")
 		room_b.position.x + room_b.size.x / 2,
 		room_b.position.y + room_b.size.y / 2
 	)
@@ -326,21 +327,22 @@ func _apply_grid_to_layers():
 				TileType.WALL:
 					wall_cells.append(pos)
 	
-	# Простой вариант без Terrain-Connect/Auto-Tiles, damit keine TileSet-Fehler auftreten:
-	# Wir setzen einfach einen gültigen Basis-Tile (source_id = 0, atlas (0,0)).
-
 	# Пол
-	for cell in floor_cells:
-		floor_layer.set_cell(cell, 0, Vector2i(0, 0))
+	if not floor_cells.is_empty():
+		floor_layer.set_cells_terrain_connect(floor_cells, 0, 1)
 
-	# Стены
-	for cell in wall_cells:
-		wall_layer.set_cell(cell, 0, Vector2i(0, 0))
+	# Стены снизу
+	if not wall_cells.is_empty():
+		wall_layer.set_cells_terrain_connect(wall_cells, 0, 0)
 
-	# Опциональные Deko-Funktionen vorerst deaktiviert, um TileSet-Fehler zu vermeiden.
-	# _build_wall_volume()
-	# _build_pillars()
-	# _build_walltops()
+	# Объемные фасады
+	_build_wall_volume()
+
+	# Колонны в углах стен (тест‑версия: один тип колонн)
+	_build_pillars()
+
+	# Бортики сверху стен
+	_build_walltops()
 
 
 # ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ СПАВНА (WALKABLE + POS) ==========
@@ -433,6 +435,7 @@ func _build_walltops():
 	if not top_cells.is_empty():
 		top_layer.set_cells_terrain_connect(top_cells, 0, 2)
 
+<<<<<<< Updated upstream:spiel-godot/Skripts/dungeon_root.gd
 func _build_wall_volume():
 	var facade_cells: Array[Vector2i] = []
 
@@ -533,3 +536,19 @@ func _place_column(cell: Vector2i) -> void:
 		Vector2i(11, 0),  # верхняя часть
 		1                 # alternative
 	)
+=======
+
+# ========== ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ДЛЯ ДРУГИХ СЦЕН (A) ==========
+
+## Проверяет, можно ли по этой клетке ходить (используется уровнем / боем)
+func is_walkable_tile(cell: Vector2i) -> bool:
+	return _get_grid(cell) == TileType.FLOOR
+
+
+## Преобразует координаты клетки сетки в мировые координаты
+## (проксирует вызов TileMapLayer.map_to_local)
+func map_to_local(cell: Vector2i) -> Vector2:
+	if floor_layer:
+		return floor_layer.map_to_local(cell)
+	return Vector2.ZERO
+>>>>>>> Stashed changes:spiel-godot/dungeon_root.gd
