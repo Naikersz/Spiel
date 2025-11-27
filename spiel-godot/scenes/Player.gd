@@ -1,43 +1,3 @@
-"""
-Player.gd - Управление персонажем с поддержкой одежды
-
-ИНСТРУКЦИЯ ПО ДОБАВЛЕНИЮ ОДЕЖДЫ:
-================================
-
-1. В Godot Editor:
-   - Откройте сцену main.tscn
-   - Найдите узел Player/Graphics
-   - Добавьте AnimatedSprite2D узлы для каждой части одежды с именами:
-     * HatLeather (или Hat) - шляпа
-     * LeatherArmor (или Armor) - торс/броня
-     * Gloves - перчатки
-     * Pants - штаны
-     * Boots - ботинки
-     * Mantal - наплечники
-     * Cuffs - манжеты
-
-2. Настройте SpriteFrames для каждого узла:
-   - В Inspector выберите SpriteFrames
-   - Создайте анимации с именами:
-     * idle_down, idle_up, idle_left, idle_right
-     * walk_down, walk_up, walk_left, walk_right
-   - Добавьте фреймы для каждой анимации
-
-3. Клавиши для экипировки (временно):
-   - Клавиша 1 - Hat/Hut (шляпа)
-   - Клавиша 2 - Leather Armor (торс)
-   - Клавиша 3 - Gloves (перчатки)
-   - Клавиша 4 - Pants (штаны)
-   - Клавиша 5 - Boots (ботинки)
-   - Клавиша 6 - Mantal (наплечники)
-   - Клавиша 7 - Cuffs (манжеты)
-
-ГДЕ ИЗМЕНИТЬ НАСТРОЙКИ:
-=======================
-- Имена узлов одежды: функция _initialize_clothing() (строки 33-48)
-- Обработка клавиш: функция _unhandled_input() (строки 76-93)
-- Добавление новых частей одежды: добавьте в _initialize_clothing() и _play_animation()
-"""
 
 extends CharacterBody2D
 
@@ -51,8 +11,7 @@ var leather_armor_anim: AnimatedSprite2D = null # 2 - Leather Armor (торс)
 var gloves_anim: AnimatedSprite2D = null        # 3 - Gloves (перчатки)
 var pants_anim: AnimatedSprite2D = null         # 4 - Pants/Hose (штаны)
 var boots_anim: AnimatedSprite2D = null         # 5 - Boots (ботинки)
-var mantal_anim: AnimatedSprite2D = null        # 6 - Mantal (наплечники/плечи)
-var cuffs_anim: AnimatedSprite2D = null         # 7 - Cuffs (манжеты/запястья)
+
 
 # Словарь для быстрого доступа к одежде
 var clothing_items: Dictionary = {}
@@ -80,8 +39,7 @@ func _initialize_clothing() -> void:
 	gloves_anim = _get_clothing_node("Graphics/GlovesLeather")
 	pants_anim = _get_clothing_node("Graphics/PantsLeather")
 	boots_anim = _get_clothing_node("Graphics/BootsLeather")
-	mantal_anim = _get_clothing_node("Graphics/MantalLeather")
-	cuffs_anim = _get_clothing_node("Graphics/CuffsLeather")
+
 	
 	# Словарь для быстрого доступа по именам
 	clothing_items = {
@@ -91,8 +49,6 @@ func _initialize_clothing() -> void:
 		"gloves": gloves_anim,
 		"pants": pants_anim,
 		"boots": boots_anim,
-		"mantal": mantal_anim,
-		"cuffs": cuffs_anim
 	}
 	
 	# Все части одежды по умолчанию скрыты
@@ -205,10 +161,6 @@ func _play_animation(anim_type: String, direction: String) -> void:
 		_set_animation_on_sprite(pants_anim, anim_name, anim_type)
 	if boots_anim and boots_anim.visible:
 		_set_animation_on_sprite(boots_anim, anim_name, anim_type)
-	if mantal_anim and mantal_anim.visible:
-		_set_animation_on_sprite(mantal_anim, anim_name, anim_type)
-	if cuffs_anim and cuffs_anim.visible:
-		_set_animation_on_sprite(cuffs_anim, anim_name, anim_type)
 
 func _set_animation_on_sprite(sprite: AnimatedSprite2D, anim_name: String, _fallback_anim: String = "") -> void:
 	if not sprite or not sprite.sprite_frames:

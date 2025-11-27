@@ -197,15 +197,17 @@ func _find_room_in_node(node: BSPNode) -> Rect2i:
 	return _find_room_in_node(node.right)
 
 func _connect_rooms_with_corridor(room_a: Rect2i, room_b: Rect2i) -> void:
-	var center_a := Vector2i(
-		room_a.position.x + room_a.size.x / 2,
-		room_a.position.y + room_a.size.y / 2
-	)
-	var center_b := Vector2i(
-		@warning_ignore("integer_division")
-		room_b.position.x + room_b.size.x / 2,
-		room_b.position.y + room_b.size.y / 2
-	)
+	@warning_ignore("integer_division")
+	var center_a_x := room_a.position.x + room_a.size.x / 2
+	@warning_ignore("integer_division")
+	var center_a_y := room_a.position.y + room_a.size.y / 2
+	var center_a := Vector2i(center_a_x, center_a_y)
+	
+	@warning_ignore("integer_division")
+	var center_b_x := room_b.position.x + room_b.size.x / 2
+	@warning_ignore("integer_division")
+	var center_b_y := room_b.position.y + room_b.size.y / 2
+	var center_b := Vector2i(center_b_x, center_b_y)
 
 	_carve_h_corridor(center_a.x, center_b.x, center_a.y)
 	_carve_v_corridor(center_a.y, center_b.y, center_b.x)
@@ -435,7 +437,6 @@ func _build_walltops():
 	if not top_cells.is_empty():
 		top_layer.set_cells_terrain_connect(top_cells, 0, 2)
 
-<<<<<<< Updated upstream:spiel-godot/Skripts/dungeon_root.gd
 func _build_wall_volume():
 	var facade_cells: Array[Vector2i] = []
 
@@ -536,19 +537,14 @@ func _place_column(cell: Vector2i) -> void:
 		Vector2i(11, 0),  # верхняя часть
 		1                 # alternative
 	)
-=======
+
 
 # ========== ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ДЛЯ ДРУГИХ СЦЕН (A) ==========
 
-## Проверяет, можно ли по этой клетке ходить (используется уровнем / боем)
-func is_walkable_tile(cell: Vector2i) -> bool:
-	return _get_grid(cell) == TileType.FLOOR
-
-
 ## Преобразует координаты клетки сетки в мировые координаты
 ## (проксирует вызов TileMapLayer.map_to_local)
+## Используется другими сценами (level_town.gd, enemy_generator.gd)
 func map_to_local(cell: Vector2i) -> Vector2:
 	if floor_layer:
 		return floor_layer.map_to_local(cell)
 	return Vector2.ZERO
->>>>>>> Stashed changes:spiel-godot/dungeon_root.gd

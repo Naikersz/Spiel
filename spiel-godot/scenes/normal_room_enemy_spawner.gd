@@ -3,7 +3,7 @@ extends Node2D
 ## normal_room_enemy_spawner.gd
 ## Генерирует врагов внутри NormalRoom1 с использованием EnemyGenerator.gd
 
-const EnemyGeneratorScript := preload("res://Skripts/enemy_generator.gd")
+const EnemyGeneratorScript := preload("res://scenes/enemy_generator.gd")
 
 @export var field_number: int = 1
 

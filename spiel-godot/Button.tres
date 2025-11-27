@@ -1,0 +1,11 @@
+[gd_resource type="StyleBoxTexture" load_steps=2 format=3 uid="uid://bdy376gr3b1gi"]
+
+[ext_resource type="Texture2D" uid="uid://blqgisgwpcybb" path="res://tilesets/test1.png" id="1_eys3j"]
+
+[resource]
+texture = ExtResource("1_eys3j")
+texture_margin_left = 4.0
+texture_margin_top = 4.0
+texture_margin_right = 4.0
+texture_margin_bottom = 4.0
+region_rect = Rect2(514, 77, 189, 46)
