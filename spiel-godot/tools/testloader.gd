@@ -1,7 +1,7 @@
 extends Node2D
 
 # Сцена игрока
-@export var player_prefab: PackedScene = preload("res://levels/player.tscn")
+@export var player_prefab: PackedScene = preload("res://scenes/player.tscn")
 
 # Уже существующий инстанс комнаты в дереве
 @onready var room_root: Node2D = $NormalRoom

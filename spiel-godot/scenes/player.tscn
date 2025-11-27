@@ -1,24 +1,24 @@
-[gd_scene load_steps=18 format=3 uid="uid://deape0t56pm74"]
+[gd_scene load_steps=18 format=3 uid="uid://c6dnqbkblork1"]
 
-[ext_resource type="Theme" uid="uid://o6jbus45psrn" path="res://fonts/new_theme.tres" id="3_efxa6"]
-[ext_resource type="PackedScene" uid="uid://c5l0aej3cgpyr" path="res://scenes/level_town.tscn" id="4_5vw27"]
-[ext_resource type="Texture2D" uid="uid://cyal686cvg71b" path="res://Theme.jpg" id="4_dg77c"]
-[ext_resource type="PackedScene" uid="uid://c6dnqbkblork1" path="res://scenes/player.tscn" id="4_ycdy4"]
-[ext_resource type="Script" uid="uid://xqdehdhsl7s0" path="res://scenes/level_town.gd" id="5_kek77"]
-[ext_resource type="Shader" uid="uid://bmjhur8bs7mo1" path="res://main.gdshader" id="8_82xsv"]
-[ext_resource type="TileSet" uid="uid://ck4pg483b1kns" path="res://Tilesett.tres" id="18_074og"]
-[ext_resource type="Texture2D" uid="uid://52pls8pkm0e1" path="res://tilesets/Terrain (32x32).png" id="19_getpj"]
-[ext_resource type="Texture2D" uid="uid://ch8beaasi0tad" path="res://tilesets/Tileset.png" id="20_ryguw"]
-[ext_resource type="Texture2D" uid="uid://pud2pr8nid16" path="res://tilesets/pfld.png" id="21_d13ii"]
-[ext_resource type="Script" uid="uid://3ty4nkd2ujvq" path="res://tools/testloader.gd" id="23_d13ii"]
+[ext_resource type="PackedScene" uid="uid://c5l0aej3cgpyr" path="res://scenes/level_town.tscn" id="1_d2wvv"]
+[ext_resource type="Script" uid="uid://xqdehdhsl7s0" path="res://scenes/level_town.gd" id="2_3v2ag"]
+[ext_resource type="Theme" uid="uid://o6jbus45psrn" path="res://fonts/new_theme.tres" id="3_jej6c"]
+[ext_resource type="Texture2D" uid="uid://cyal686cvg71b" path="res://Theme.jpg" id="4_f1ej7"]
+[ext_resource type="Shader" uid="uid://bmjhur8bs7mo1" path="res://main.gdshader" id="5_oprun"]
+[ext_resource type="TileSet" uid="uid://ck4pg483b1kns" path="res://Tilesett.tres" id="6_a8ls1"]
+[ext_resource type="Texture2D" uid="uid://52pls8pkm0e1" path="res://tilesets/Terrain (32x32).png" id="7_qfm1y"]
+[ext_resource type="Texture2D" uid="uid://ch8beaasi0tad" path="res://tilesets/Tileset.png" id="8_fulsm"]
+[ext_resource type="Texture2D" uid="uid://pud2pr8nid16" path="res://tilesets/pfld.png" id="9_4r5pv"]
+[ext_resource type="Script" uid="uid://3ty4nkd2ujvq" path="res://tools/testloader.gd" id="10_60mlk"]
+[ext_resource type="PackedScene" uid="uid://c6dnqbkblork1" path="res://scenes/player.tscn" id="11_i4ail"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_cegan"]
-shader = ExtResource("8_82xsv")
+shader = ExtResource("5_oprun")
 shader_parameter/fog_strength = 1.2
 shader_parameter/fog_color = Vector3(0, 0, 0)
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_1u8w0"]
-texture = ExtResource("19_getpj")
+texture = ExtResource("7_qfm1y")
 texture_region_size = Vector2i(32, 32)
 2:2/0 = 0
 2:2/0/terrain_set = 0
@@ -963,7 +963,7 @@ texture_region_size = Vector2i(32, 32)
 13:11/0/terrains_peering_bit/top_side = 1
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_0odxb"]
-texture = ExtResource("20_ryguw")
+texture = ExtResource("8_fulsm")
 margins = Vector2i(12, 0)
 texture_region_size = Vector2i(32, 33)
 0:0/0 = 0
@@ -1166,7 +1166,7 @@ texture_region_size = Vector2i(32, 33)
 12:13/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_lswn8"]
-texture = ExtResource("21_d13ii")
+texture = ExtResource("9_4r5pv")
 texture_region_size = Vector2i(32, 32)
 1:0/0 = 0
 0:3/0 = 0
@@ -1429,7 +1429,7 @@ texture_region_size = Vector2i(32, 32)
 18:10/0 = 0
 
 [sub_resource type="TileSetAtlasSource" id="TileSetAtlasSource_a6jrf"]
-texture = ExtResource("19_getpj")
+texture = ExtResource("7_qfm1y")
 texture_region_size = Vector2i(32, 32)
 1:1/0 = 0
 1:1/0/terrain_set = 0
@@ -1980,8 +1980,8 @@ sources/2 = SubResource("TileSetAtlasSource_lswn8")
 
 [node name="main" type="Node2D"]
 
-[node name="LevelTown" parent="." instance=ExtResource("4_5vw27")]
-script = ExtResource("5_kek77")
+[node name="LevelTown" parent="." instance=ExtResource("1_d2wvv")]
+script = ExtResource("2_3v2ag")
 
 [node name="Camera2D" type="Camera2D" parent="LevelTown"]
 
@@ -1994,7 +1994,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-theme = ExtResource("3_efxa6")
+theme = ExtResource("3_jej6c")
 
 [node name="TextureRect" type="TextureRect" parent="LevelTown/Camera2D/CanvasLayer/UI"]
 layout_mode = 1
@@ -2003,7 +2003,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-texture = ExtResource("4_dg77c")
+texture = ExtResource("4_f1ej7")
 stretch_mode = 6
 
 [node name="HPBar" type="ProgressBar" parent="LevelTown/Camera2D/CanvasLayer/UI"]
@@ -2016,7 +2016,7 @@ layout_mode = 0
 offset_right = 8.0
 offset_bottom = 8.0
 
-[node name="Player" parent="LevelTown" instance=ExtResource("4_ycdy4")]
+[node name="Player" parent="LevelTown" instance=ExtResource("11_i4ail")]
 
 [node name="CanvasLayer" type="CanvasLayer" parent="."]
 
@@ -2040,15 +2040,15 @@ y_sort_enabled = true
 
 [node name="TileMapFloor" type="TileMap" parent="DungeonRoot"]
 y_sort_enabled = true
-tile_set = ExtResource("18_074og")
+tile_set = ExtResource("6_a8ls1")
 format = 2
 
 [node name="FloorLayer" type="TileMapLayer" parent="DungeonRoot/TileMapFloor"]
-tile_set = ExtResource("18_074og")
+tile_set = ExtResource("6_a8ls1")
 
 [node name="WallLayer" type="TileMapLayer" parent="DungeonRoot/TileMapFloor"]
 z_index = 1
-tile_set = ExtResource("18_074og")
+tile_set = ExtResource("6_a8ls1")
 
 [node name="ColumnsLayer" type="TileMapLayer" parent="DungeonRoot/TileMapFloor"]
 z_index = 2
@@ -2058,12 +2058,12 @@ y_sort_origin = -32
 
 [node name="TopLayer" type="TileMapLayer" parent="DungeonRoot/TileMapFloor"]
 y_sort_enabled = true
-tile_set = ExtResource("18_074og")
+tile_set = ExtResource("6_a8ls1")
 y_sort_origin = 8
 
 [node name="TestRunner" type="Node2D" parent="DungeonRoot/TileMapFloor/TopLayer"]
 scale = Vector2(0.671093, 1.2358413)
-script = ExtResource("23_d13ii")
+script = ExtResource("10_60mlk")
 
 [node name="NormalRoom1" parent="DungeonRoot/TileMapFloor/TopLayer/TestRunner"]
 _import_path = NodePath("")
