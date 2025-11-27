@@ -65,6 +65,26 @@ offset_bottom = 250.0
 bbcode_enabled = true
 visible = false
 
+[node name="LootLabel" type="Label" parent="CanvasLayer"]
+layout_mode = 0
+anchor_left = 0.0
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = 10.0
+offset_top = -40.0
+offset_right = 310.0
+offset_bottom = -10.0
+horizontal_alignment = 0
+vertical_alignment = 1
+autowrap_mode = 2
+visible = false
+text = ""
+
+[node name="LootTimer" type="Timer" parent="CanvasLayer"]
+wait_time = 2.0
+one_shot = true
+
 [node name="WinOverlay" type="Control" parent="CanvasLayer"]
 visible = false
 layout_mode = 3

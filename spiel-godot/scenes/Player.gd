@@ -54,8 +54,19 @@ var boots_anim: AnimatedSprite2D = null         # 5 - Boots (ботинки)
 var mantal_anim: AnimatedSprite2D = null        # 6 - Mantal (наплечники/плечи)
 var cuffs_anim: AnimatedSprite2D = null         # 7 - Cuffs (манжеты/запястья)
 
-# Словарь для быстрого доступа к одежде
+## Словарь для быстрого доступа к одежде (имена: "hat", "leather_armor", "gloves", ...)
 var clothing_items: Dictionary = {}
+
+## Zuordnung von Ausrüstungs-Slots zu Clothing-Layern im Player
+## (muss zu den Keys in clothing_items passen)
+const SLOT_TO_CLOTHING := {
+	"helmet": "hat",
+	"chest": "leather_armor",
+	"gloves": "gloves",
+	"pants": "pants",
+	"boots": "boots",
+	# "weapon" / "shield" aktuell nicht als Kleidung umgesetzt
+}
 
 var speed: float = 200.0
 
@@ -68,6 +79,9 @@ func _ready() -> void:
 	# Инициализируем все части одежды
 	_initialize_clothing()
 	$Camera2D.make_current()
+
+	# Sichtbare Kleidung anhand der gespeicherten Ausrüstung setzen
+	_apply_equipped_items()
 	
 	# Инициализируем с idle анимацией
 	_play_animation("idle", last_facing)
@@ -100,6 +114,69 @@ func _initialize_clothing() -> void:
 		if clothing_items[item_name]:
 			clothing_items[item_name].visible = false
 
+
+func _apply_equipped_items() -> void:
+	# Liest die aktuell angelegten Items aus der Spieler-JSON
+	# und blendet passende Clothing-Layer ein (z.B. Leather-Rüstung).
+	var slot_index: int = Constants.current_slot_index
+	var slot = Constants.SAVE_SLOTS[slot_index]
+	var player_path = Constants.get_player_path(slot)
+
+	if not FileAccess.file_exists(player_path):
+		return
+
+	var file := FileAccess.open(player_path, FileAccess.READ)
+	if file == null:
+		return
+
+	var json_string := file.get_as_text()
+	file.close()
+
+	var json_obj := JSON.new()
+	if json_obj.parse(json_string) != OK:
+		return
+
+	# JSON.data kann Nil oder etwas anderes als Dictionary sein -> absichern
+	var raw_data = json_obj.data
+	if not (raw_data is Dictionary):
+		return
+	var player_data: Dictionary = raw_data
+
+	var equipped: Dictionary = {}
+	var raw_equipped = player_data.get("equipped", {})
+	if raw_equipped is Dictionary:
+		equipped = raw_equipped
+
+	# Zuerst alles ausblenden
+	for key in clothing_items.keys():
+		var spr: AnimatedSprite2D = clothing_items[key]
+		if spr:
+			spr.visible = false
+
+	# Dann pro Slot entscheiden, was angezeigt wird
+	for slot_name in SLOT_TO_CLOTHING.keys():
+		if not equipped.has(slot_name):
+			continue
+		var item = equipped.get(slot_name)
+		if not (item is Dictionary):
+			continue
+		var item_dict: Dictionary = item
+
+		# "mat_data" statt "material", um die CanvasItem-Property nicht zu überschreiben
+		var mat_data: Dictionary = item_dict.get("material", {})
+		var mat_type: String = String(mat_data.get("type", "")).to_lower()
+
+		var clothing_key: String = SLOT_TO_CLOTHING[slot_name]
+		var spr: AnimatedSprite2D = clothing_items.get(clothing_key, null)
+		if spr == null:
+			continue
+
+		# Einfaches Mapping: wenn das Item-Material "leather" ist,
+		# zeigen wir die Leather-Sprites an. Für andere Materialien
+		# können später weitere Layers (z.B. ArmorIron) ergänzt werden.
+		if mat_type == "leather":
+			spr.visible = true
+
 func _get_clothing_node(path: String) -> AnimatedSprite2D:
 	# Безопасно получаем узел одежды
 	if has_node(path):
@@ -127,7 +204,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_7:
 				toggle_clothing("cuffs")
 
-func _physics_process(delta: float) -> void:
+func _physics_process(_delta: float) -> void:
 	print("PHYS TICK")
 	var input_vector := Vector2.ZERO
 

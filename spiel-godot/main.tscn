@@ -1,4 +1,4 @@
-[gd_scene load_steps=19 format=3 uid="uid://deape0t56pm74"]
+[gd_scene load_steps=18 format=3 uid="uid://deape0t56pm74"]
 
 [ext_resource type="Theme" uid="uid://o6jbus45psrn" path="res://fonts/new_theme.tres" id="3_efxa6"]
 [ext_resource type="PackedScene" uid="uid://c5l0aej3cgpyr" path="res://scenes/level_town.tscn" id="4_5vw27"]
@@ -10,7 +10,6 @@
 [ext_resource type="Texture2D" uid="uid://52pls8pkm0e1" path="res://tilesets/Terrain (32x32).png" id="19_getpj"]
 [ext_resource type="Texture2D" uid="uid://ch8beaasi0tad" path="res://tilesets/Tileset.png" id="20_ryguw"]
 [ext_resource type="Texture2D" uid="uid://pud2pr8nid16" path="res://tilesets/pfld.png" id="21_d13ii"]
-[ext_resource type="PackedScene" path="res://normal_room_1.tscn" id="22_ryguw"]
 [ext_resource type="Script" uid="uid://3ty4nkd2ujvq" path="res://tools/testloader.gd" id="23_d13ii"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_cegan"]
@@ -2066,5 +2065,15 @@ y_sort_origin = 8
 scale = Vector2(0.671093, 1.2358413)
 script = ExtResource("23_d13ii")
 
-[node name="NormalRoom1" parent="DungeonRoot/TileMapFloor/TopLayer/TestRunner" instance=ExtResource("22_ryguw")]
+[node name="NormalRoom1" parent="DungeonRoot/TileMapFloor/TopLayer/TestRunner"]
+_import_path = NodePath("")
+unique_name_in_owner = false
+process_mode = 0
+process_priority = 0
+process_physics_priority = 0
+process_thread_group = 0
+physics_interpolation_mode = 0
+auto_translate_mode = 0
+editor_description = ""
 scale = Vector2(1, 1)
+script = null
