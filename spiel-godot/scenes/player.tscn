@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://c5l0aej3cgpyr" path="res://scenes/level_town.tscn" id="1_d2wvv"]
 [ext_resource type="Script" uid="uid://xqdehdhsl7s0" path="res://scenes/level_town.gd" id="2_3v2ag"]
 [ext_resource type="Theme" uid="uid://o6jbus45psrn" path="res://fonts/new_theme.tres" id="3_jej6c"]
-[ext_resource type="Texture2D" uid="uid://cyal686cvg71b" path="res://Theme.jpg" id="4_f1ej7"]
+[ext_resource type="Texture2D" uid="uid://s0kvt2j7k8qe" path="res://images/Theme.jpg" id="4_f1ej7"]
 [ext_resource type="Shader" uid="uid://bmjhur8bs7mo1" path="res://main.gdshader" id="5_oprun"]
 [ext_resource type="TileSet" uid="uid://ck4pg483b1kns" path="res://Tilesett.tres" id="6_a8ls1"]
 [ext_resource type="Texture2D" uid="uid://52pls8pkm0e1" path="res://tilesets/Terrain (32x32).png" id="7_qfm1y"]
