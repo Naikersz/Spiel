@@ -435,6 +435,7 @@ func _build_walltops():
 	if not top_cells.is_empty():
 		top_layer.set_cells_terrain_connect(top_cells, 0, 2)
 
+<<<<<<< Updated upstream:spiel-godot/Skripts/dungeon_root.gd
 func _build_wall_volume():
 	var facade_cells: Array[Vector2i] = []
 
@@ -535,3 +536,19 @@ func _place_column(cell: Vector2i) -> void:
 		Vector2i(11, 0),  # верхняя часть
 		1                 # alternative
 	)
+=======
+
+# ========== ВСПОМОГАТЕЛЬНЫЕ МЕТОДЫ ДЛЯ ДРУГИХ СЦЕН (A) ==========
+
+## Проверяет, можно ли по этой клетке ходить (используется уровнем / боем)
+func is_walkable_tile(cell: Vector2i) -> bool:
+	return _get_grid(cell) == TileType.FLOOR
+
+
+## Преобразует координаты клетки сетки в мировые координаты
+## (проксирует вызов TileMapLayer.map_to_local)
+func map_to_local(cell: Vector2i) -> Vector2:
+	if floor_layer:
+		return floor_layer.map_to_local(cell)
+	return Vector2.ZERO
+>>>>>>> Stashed changes:spiel-godot/dungeon_root.gd

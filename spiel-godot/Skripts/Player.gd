@@ -41,9 +41,9 @@ Player.gd - Управление персонажем с поддержкой о
 
 extends CharacterBody2D
 
-@onready var graphics = $Graphics
-@onready var body_anim: AnimatedSprite2D = $Graphics/Body
-@onready var head_anim: AnimatedSprite2D = $Graphics/Head
+@onready var graphics: Node2D = get_node_or_null("Graphics")
+@onready var body_anim: AnimatedSprite2D = get_node_or_null("Graphics/Body")
+@onready var head_anim: AnimatedSprite2D = get_node_or_null("Graphics/Head")
 
 # Части одежды (кожаная из pygame игры) - опциональные узлы
 var hat_anim: AnimatedSprite2D = null           # 1 - Hat/Hut (шляпа)
@@ -67,7 +67,43 @@ var last_facing: String = "down"
 func _ready() -> void:
 	# Инициализируем все части одежды
 	_initialize_clothing()
-	$Camera2D.make_current()
+
+	# Sicherstellen, dass es einen Graphics-Container gibt
+	if not graphics:
+		graphics = Node2D.new()
+		graphics.name = "Graphics"
+		add_child(graphics)
+
+	if not body_anim:
+		body_anim = AnimatedSprite2D.new()
+		body_anim.name = "Body"
+		if graphics:
+			graphics.add_child(body_anim)
+
+	if not head_anim:
+		head_anim = AnimatedSprite2D.new()
+		head_anim.name = "Head"
+		head_anim.position = Vector2(0, -8)
+		if graphics:
+			graphics.add_child(head_anim)
+
+	# Sehr einfache sichtbare Markierung für den Spieler,
+	# falls noch keine richtigen Sprites gesetzt sind.
+	var debug_rect := ColorRect.new()
+	debug_rect.color = Color(0, 1, 0, 0.8)
+	debug_rect.size = Vector2(16, 16)
+	debug_rect.position = Vector2(-8, -8)
+	add_child(debug_rect)
+
+	# Камера игрока (falls vorhanden) aktivieren und auf den Spieler folgen lassen
+	var cam := get_node_or_null("Camera2D")
+	if cam:
+		# Wenn das Script camera_2d.gd verwendet wird, dort das target setzen
+		if "target" in cam:
+			cam.target = self
+		cam.make_current()
+	else:
+		print("Warning: Player Camera2D not found")
 	
 	# Инициализируем с idle анимацией
 	_play_animation("idle", last_facing)
@@ -127,7 +163,7 @@ func _unhandled_input(event: InputEvent) -> void:
 			KEY_7:
 				toggle_clothing("cuffs")
 
-func _physics_process(delta: float) -> void:
+func _physics_process(_delta: float) -> void:
 	var input_vector := Vector2.ZERO
 
 	if Input.is_action_pressed("move_right"):
