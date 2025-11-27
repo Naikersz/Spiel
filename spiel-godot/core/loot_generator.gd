@@ -126,10 +126,8 @@ func _roll_range_block(block: Dictionary) -> Dictionary:
 			rolled_value = randf_range(float(min_val), float(max_val))
 		else:
 			rolled_value = randi_range(int(min_val), int(max_val))
-
-		# Alle gerollten Item-Werte werden als Integer gespeichert,
-		# damit keine Floats mehr in Items/Stats landen.
-		rolled[base_key] = int(round(rolled_value))
+		
+		rolled[base_key] = rolled_value
 	
 	return rolled
 
@@ -182,7 +180,7 @@ func _roll_enchantments(item_level: int, max_slots: int, allowed_ids: Array) -> 
 			"id": enchant.get("id"),
 			"name": enchant.get("name"),
 			"type": enchant.get("type"),
-			"value": int(final_value),
+			"value": final_value,
 			"rolled_tier": rolled_tier
 		})
 	
