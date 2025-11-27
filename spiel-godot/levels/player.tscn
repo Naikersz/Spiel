@@ -10,7 +10,7 @@
 [ext_resource type="SpriteFrames" uid="uid://ctu1vc2qwlpbf" path="res://frames/boots_leather.tres" id="8_gh8v2"]
 [ext_resource type="SpriteFrames" uid="uid://dn7m34g132c2b" path="res://frames/cuffs_leather.tres" id="9_tno8w"]
 [ext_resource type="SpriteFrames" uid="uid://df6fcb24tn5il" path="res://frames/mantal_leather.tres" id="10_qpfp8"]
-[ext_resource type="Script" path="res://camera_2d.gd" id="11_5a7mk"]
+[ext_resource type="Script" path="res://Skripts/camera_2d.gd" id="11_5a7mk"]
 
 [sub_resource type="CapsuleShape2D" id="CapsuleShape2D_yaehf"]
 

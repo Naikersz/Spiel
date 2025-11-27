@@ -4,6 +4,7 @@ extends Node2D
 ## Генерирует врагов внутри NormalRoom1 с использованием EnemyGenerator.gd
 
 const EnemyGeneratorScript := preload("res://Skripts/enemy_generator.gd")
+const LootGeneratorScript := preload("res://core/loot_generator.gd")
 
 @export var field_number: int = 1
 
@@ -38,21 +39,24 @@ var enemy_generator: Node = null
 var enemies_root: Node2D = null
 var enemy_data_map: Dictionary = {}
 var player: Node2D = null
-var player_stats: Dictionary = {
-	"damage": 10,
-	"defense": 5,
-}
+var player_stats: Dictionary = {}
 var level_type: String = "Feld"
+var loot_generator
+var slot_index: int = 0
 @onready var enemy_info_label: RichTextLabel = $CanvasLayer/EnemyInfoLabel
 @onready var level_label: Label = $CanvasLayer/LevelLabel
 @onready var win_overlay: Control = $CanvasLayer/WinOverlay
 @onready var win_retry_button: Button = $CanvasLayer/WinOverlay/Panel/VBoxContainer/Buttons/RetryButton
 @onready var win_next_button: Button = $CanvasLayer/WinOverlay/Panel/VBoxContainer/Buttons/NextButton
 @onready var win_exit_button: Button = $CanvasLayer/WinOverlay/Panel/VBoxContainer/Buttons/ExitButton
+@onready var loot_label: Label = $CanvasLayer/LootLabel
+@onready var loot_timer: Timer = $CanvasLayer/LootTimer
 
 
 func _ready() -> void:
 	enemy_generator = EnemyGeneratorScript.new()
+	loot_generator = LootGeneratorScript.new()
+	slot_index = Constants.current_slot_index
 	# Versuche Player im Baum zu finden (globaler Player-Node)
 	player = get_tree().get_root().find_child("Player", true, false)
 
@@ -60,9 +64,30 @@ func _ready() -> void:
 	level_type = Constants.current_level_type
 	field_number = Constants.current_level_number
 
+	_load_player_stats()
+
 	_setup_dev_overlay()
 	_update_level_label()
 	_regenerate_enemies()
+
+
+func _load_player_stats() -> void:
+	# Gleiche vereinfachte Logik wie in scenes/battle_scene.gd
+	player_stats = {}
+	var slot = Constants.SAVE_SLOTS[slot_index]
+	var player_path = Constants.get_player_path(slot)
+
+	if FileAccess.file_exists(player_path):
+		var file = FileAccess.open(player_path, FileAccess.READ)
+		if file:
+			var json_string = file.get_as_text()
+			file.close()
+			var json_obj = JSON.new()
+			if json_obj.parse(json_string) == OK:
+				var player_data = json_obj.data
+				player_stats = player_data.get("stats", {})
+				if player_stats.is_empty():
+					player_stats = player_data.get("total_stats", {})
 
 
 func _setup_dev_overlay() -> void:
@@ -85,8 +110,8 @@ func _setup_dev_overlay() -> void:
 
 	_update_dev_labels()
 
-	# Sichtbarkeit abhängig vom Dev-Modus
-	dev_overlay.visible = DevSettings.dev_mode
+	# Sichtbarkeit abhängig vom Dev-Modus und gemerktem Overlay-Status
+	dev_overlay.visible = DevSettings.dev_mode and DevSettings.dev_overlay_visible
 
 	# Buttons verbinden
 	if dev_minus_button:
@@ -121,6 +146,8 @@ func _setup_dev_overlay() -> void:
 		win_next_button.pressed.connect(_on_win_next_pressed)
 	if win_exit_button:
 		win_exit_button.pressed.connect(_on_win_exit_pressed)
+	if loot_timer:
+		loot_timer.timeout.connect(_on_loot_timer_timeout)
 
 
 func _update_dev_labels() -> void:
@@ -328,6 +355,7 @@ func _on_dev_toggle_pressed() -> void:
 		return
 	if dev_overlay:
 		dev_overlay.visible = not dev_overlay.visible
+		DevSettings.dev_overlay_visible = dev_overlay.visible
 
 
 func _input(event: InputEvent) -> void:
@@ -489,6 +517,7 @@ func _apply_attack_to_enemy(enemy: Node2D) -> void:
 	var enemy_hp: int = int(data.get("current_hp", 0))
 	var enemy_def: int = int(stats.get("defense", 0))
 
+	# Spieler-Schaden aus gespeicherten Stats (wie in Battle-Szene)
 	var p_dmg: int = int(player_stats.get("damage", 10))
 	var damage_done: int = max(1, p_dmg - enemy_def)
 
@@ -505,9 +534,66 @@ func _apply_attack_to_enemy(enemy: Node2D) -> void:
 
 	# Gegner entfernen, wenn HP 0
 	if new_hp <= 0:
+		_handle_enemy_death(data)
 		enemy.queue_free()
 		enemy_data_map.erase(enemy)
 		_check_all_enemies_defeated()
+
+
+func _handle_enemy_death(enemy_data: Dictionary) -> void:
+	if loot_generator == null:
+		_show_loot_message("Kein Loot")
+		return
+
+	var monster_level: int = int(enemy_data.get("level", 1))
+	var loot_item: Dictionary = loot_generator.generate_loot(monster_level)
+	if loot_item.is_empty():
+		_show_loot_message("Kein Loot")
+		return
+
+	_add_item_to_inventory(loot_item)
+	var item_name := String(loot_item.get("name", loot_item.get("id", "Item")))
+	print("💰 Dungeon-Loot erhalten: %s" % item_name)
+
+	_show_loot_message("Loot erhalten: %s" % item_name)
+
+
+func _add_item_to_inventory(item: Dictionary) -> void:
+	# Gleiche Logik wie in scenes/battle_scene.gd
+	var slot = Constants.SAVE_SLOTS[slot_index]
+	var save_path = Constants.get_save_path(slot)
+	DirAccess.make_dir_recursive_absolute(save_path)
+	var inventory_path = save_path.path_join("global_inventory.json")
+
+	var inventory: Array = []
+	if FileAccess.file_exists(inventory_path):
+		var file_r = FileAccess.open(inventory_path, FileAccess.READ)
+		if file_r:
+			var json_string = file_r.get_as_text()
+			file_r.close()
+			var json_obj = JSON.new()
+			if json_obj.parse(json_string) == OK:
+				inventory = json_obj.data
+
+	inventory.append(item)
+
+	var file_w = FileAccess.open(inventory_path, FileAccess.WRITE)
+	if file_w:
+		file_w.store_string(JSON.stringify(inventory, "\t"))
+		file_w.close()
+
+
+func _show_loot_message(text: String) -> void:
+	if loot_label:
+		loot_label.text = text
+		loot_label.visible = true
+	if loot_timer:
+		loot_timer.start()
+
+
+func _on_loot_timer_timeout() -> void:
+	if loot_label:
+		loot_label.visible = false
 
 
 func _check_all_enemies_defeated() -> void:

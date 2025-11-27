@@ -136,7 +136,9 @@ func _select_random_enchantments(
 
 
 func _apply_enchantments_to_stats(base_stats: Dictionary, enchantments_list: Array) -> Dictionary:
-	# Stark vereinfachte Version: wendet nur direkten Schaden/Def-Bonus an.
+	# Wendet Verzauberungen auf die Basis-Stats an.
+	# - damage, res_physical: flache Werte
+	# - attack_speed: Prozent-Modifier auf die Basis-Angriffsgeschwindigkeit
 	var final_stats: Dictionary = base_stats.duplicate(true)
 
 	for enchant in enchantments_list:
@@ -147,7 +149,11 @@ func _apply_enchantments_to_stats(base_stats: Dictionary, enchantments_list: Arr
 			final_stats["damage"] = final_stats.get("damage", 0) + v
 		elif t == "res_physical":
 			final_stats["defense"] = final_stats.get("defense", 0) + v
-		# Erweiterbar für Prozentwerte usw.
+		elif t == "attack_speed":
+			# v ist Prozentwert, z.B. 10 = +10%
+			var base_speed := float(final_stats.get("attack_speed", base_stats.get("attack_speed", 1.0)))
+			var factor := 1.0 + (v / 100.0)
+			final_stats["attack_speed"] = base_speed * factor
 
 	return final_stats
 

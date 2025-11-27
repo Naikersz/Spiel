@@ -202,7 +202,6 @@ func _connect_rooms_with_corridor(room_a: Rect2i, room_b: Rect2i) -> void:
 		room_a.position.y + room_a.size.y / 2
 	)
 	var center_b := Vector2i(
-		@warning_ignore("integer_division")
 		room_b.position.x + room_b.size.x / 2,
 		room_b.position.y + room_b.size.y / 2
 	)
@@ -327,22 +326,21 @@ func _apply_grid_to_layers():
 				TileType.WALL:
 					wall_cells.append(pos)
 	
+	# Простой вариант без Terrain-Connect/Auto-Tiles, damit keine TileSet-Fehler auftreten:
+	# Wir setzen einfach einen gültigen Basis-Tile (source_id = 0, atlas (0,0)).
+
 	# Пол
-	if not floor_cells.is_empty():
-		floor_layer.set_cells_terrain_connect(floor_cells, 0, 1)
+	for cell in floor_cells:
+		floor_layer.set_cell(cell, 0, Vector2i(0, 0))
 
-	# Стены снизу
-	if not wall_cells.is_empty():
-		wall_layer.set_cells_terrain_connect(wall_cells, 0, 0)
+	# Стены
+	for cell in wall_cells:
+		wall_layer.set_cell(cell, 0, Vector2i(0, 0))
 
-	# Объемные фасады
-	_build_wall_volume()
-
-	# Колонны в углах стен (тест‑версия: один тип колонн)
-	_build_pillars()
-
-	# Бортики сверху стен
-	_build_walltops()
+	# Опциональные Deko-Funktionen vorerst deaktiviert, um TileSet-Fehler zu vermeiden.
+	# _build_wall_volume()
+	# _build_pillars()
+	# _build_walltops()
 
 
 # ========== ВСПОМОГАТЕЛЬНЫЕ ФУНКЦИИ ДЛЯ СПАВНА (WALKABLE + POS) ==========
